@@ -440,11 +440,11 @@ var TURN=0;   // 돌 때 몸이 살짝 기우는 정도
 var CX={tgt:null,hold:0,go:null,last:0};
 var CXF=new THREE.Vector3(),CXV=new THREE.Vector3();
 function cxTick(dt){if(MODE!=='ar'){return}if(TEL.t>0.02){for(var k0 in CXL){CXL[k0].ln.material.opacity=0;CXL[k0].lb.visible=false}$('tgt').hidden=true;guide();return}
- CXF.set(0,0,-1).applyQuaternion(C.quaternion);var best=null,ba=1e9,thr=Math.max(6,C.fov*.22)*D2R;
+ CXF.set(0,0,-1).applyQuaternion(C.quaternion);var best=null,ba=1e9,thr=Math.max(AR.on?9:6,C.fov*(AR.on?.3:.22))*D2R;
  for(var id in CXL){var o=CXL[id];if(o.alt<.03)continue;CXV.copy(o.an).applyQuaternion(G3.quaternion).normalize();var a=Math.acos(Math.max(-1,Math.min(1,CXF.dot(CXV))));
   if(a>=thr&&a<thr*6){for(var q=0;q<o.pts.length;q+=2){CXV.copy(o.pts[q]).applyQuaternion(G3.quaternion).normalize();if(Math.acos(Math.max(-1,Math.min(1,CXF.dot(CXV))))<thr*.8){a=Math.min(a,thr*.95);break}}}
   if(a<thr&&a<ba){ba=a;best=id}}
- if(best!==CX.tgt){CX.tgt=best;CX.hold=0}else if(best)CX.hold+=dt;
+ if(best&&best===CX.tgt){CX.hold+=dt;CX.miss=0}else if(!best&&CX.tgt&&(CX.miss=(CX.miss||0)+dt)<.8){best=CX.tgt}else if(best!==CX.tgt){CX.tgt=best;CX.hold=0;CX.miss=0}
  var got=cxAll();
  for(var k in CXL){var o2=CXL[k],want=k===best||k===CX.go?1:SHOWALL?.28:0;o2.k+=(want-o2.k)*Math.min(1,dt*5);o2.ln.material.opacity=o2.k*.9;o2.lb.visible=(o2.k>.35&&(!!got[k]||CX.hold>=1||k===CX.go))||(SHOWALL&&!!got[k]&&o2.alt>.03)}
  var need=best&&!got[best],r=$('ring');r.style.setProperty('--p',((need?Math.min(1,CX.hold/3):0)*360).toFixed(0)+'deg');r.classList.toggle('hit',!!best);
@@ -471,7 +471,7 @@ function arEv(e){if(e.alpha==null&&e.webkitCompassHeading==null)return;if(e.type
  else{AR.a=e.alpha;d=arDir()}
  if(!AR.on||AR.hold)return;
  // 흔들림 잡기 : 아주 작은 떨림은 무시하고(확대할수록 더 작게), 크게 돌릴 때만 빨리 따라감
- var n=skyPos(d[1],d[0],1);if(!AR.v){AR.v=n.clone()}else{var ang=AR.v.angleTo(n),fv=V.fov*D2R,dz=Math.max(.3*D2R,fv*.015);if(ang<dz)return;AR.v.lerp(n,Math.min(1,.1+ang/(fv*.4))).normalize()}
+ var n=skyPos(d[1],d[0],1);if(!AR.v){AR.v=n.clone()}else{var ang=AR.v.angleTo(n),fv=V.fov*D2R,dz=Math.max(.9*D2R,fv*.03);if(ang<dz)return;AR.v.lerp(n,Math.min(1,.05+ang/(fv*1.2))).normalize()}
  V.talt=Math.asin(Math.max(-1,Math.min(1,AR.v.y)));V.taz=Math.atan2(AR.v.x,-AR.v.z)}
 function arOn(){function go(){AR.on=1;AR.ok=0;addEventListener('deviceorientationabsolute',arEv,true);addEventListener('deviceorientation',arEv,true);chips();
   setTimeout(function(){if(AR.on&&!AR.ok){AR.on=0;chips();toast('이 기기는 방향 센서가 없어요 · 손가락으로 끌어 둘러보세요',3500)}},2500)}
@@ -834,7 +834,7 @@ if(/[?&]pro=1/.test(location.search)){TEL.pro=true;try{localStorage.setItem('sta
 /* 그리기 고리 */
 var last=performance.now();
 function loop(now){requestAnimationFrame(loop);var dt=Math.min(.1,(now-last)/1000);last=now;if(MODE!=='ar')return;
- var _q0=G3?G3.quaternion.clone():null;skySpin();if(_q0&&G3&&V.fov<1.5&&(!AR.on||AR.hold)){var dq=G3.quaternion.clone().multiply(_q0.invert());[['az','alt'],['taz','talt']].forEach(function(k){var v=skyPos(V[k[1]],V[k[0]],1).applyQuaternion(dq);V[k[1]]=Math.asin(Math.max(-1,Math.min(1,v.y)));V[k[0]]=Math.atan2(v.x,-v.z)})}telApply();telSeeing(now);dsoTick();tname();tguide();var da=((V.taz-V.az+Math.PI*3)%(Math.PI*2))-Math.PI,k=1-Math.exp(-dt*(AR.on?5.5:14));V.az+=da*k;V.alt+=(V.talt-V.alt)*k;camUpd();cxTick(dt);R3.autoClear=true;R3.setScissorTest(false);R3.setViewport(0,0,innerWidth,innerHeight);R3.render(S,C);
+ var _q0=G3?G3.quaternion.clone():null;skySpin();if(_q0&&G3&&V.fov<1.5&&(!AR.on||AR.hold)){var dq=G3.quaternion.clone().multiply(_q0.invert());[['az','alt'],['taz','talt']].forEach(function(k){var v=skyPos(V[k[1]],V[k[0]],1).applyQuaternion(dq);V[k[1]]=Math.asin(Math.max(-1,Math.min(1,v.y)));V[k[0]]=Math.atan2(v.x,-v.z)})}telApply();telSeeing(now);dsoTick();tname();tguide();var da=((V.taz-V.az+Math.PI*3)%(Math.PI*2))-Math.PI,k=1-Math.exp(-dt*(AR.on?3:14));V.az+=da*k;V.alt+=(V.talt-V.alt)*k;camUpd();cxTick(dt);R3.autoClear=true;R3.setScissorTest(false);R3.setViewport(0,0,innerWidth,innerHeight);R3.render(S,C);
  if(TEL.t>0.02)return;
  var cw=Math.min(innerWidth*.42,230),ch=cw*1.25,cx=(innerWidth-cw)/2,cy=innerWidth>=900?92:160;   // 아래 가운데 (조작 줄 위)
  var turn=da*k/Math.max(dt,.001);TURN+=(Math.max(-1,Math.min(1,turn*.25))-TURN)*Math.min(1,dt*6);ME.rotation.y=Math.PI-TURN*.5;

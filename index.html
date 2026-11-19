@@ -44,8 +44,12 @@ button{font:inherit;color:inherit;border:0;background:none;cursor:pointer;paddin
 .card .t{font:700 17px var(--fd);color:#9a6a00}
 .card .lab{margin:10px 0 6px;display:flex;justify-content:center}
 .card .lab canvas{max-width:100%;height:auto;border-radius:12px}
+.card .hgw{--ink:#1B1A17;--acc:#E8321E;--z1:#E4DDF6;--z2:#D9EEE6;--z3:#F6E2D4;--slot:#ECE8DF;--bk:46px;display:flex;justify-content:center;align-items:flex-start;flex-wrap:wrap;gap:6px 20px;margin:12px 0 4px}
+.card .hgw .wd{display:flex;align-items:flex-start;gap:3px}.card .hgw .sy{display:flex;flex-direction:column;align-items:center;gap:6px}
+.card .hgw .hb svg{display:block;overflow:visible}.card .hgw .en{font-size:15px;line-height:18px;font-weight:700;color:#3b3427;letter-spacing:.2px}.card .hgw .en.st{color:#c2410c}
+.card .hgw .dt{display:flex;flex-direction:column;align-items:center;color:#a08a5c;font-weight:900;width:8px}.card .hgw .dt i{font-style:normal;line-height:1}
 .card p{margin:6px 0 0;font-size:13.5px;color:#4b4436;line-height:1.55}
-.card .bt{display:flex;gap:8px;margin-top:12px}.card .bt button{flex:1;border-radius:12px;padding:10px;font-weight:800;font-size:14px;background:#2B3A67;color:#fff}.card .bt button.w{background:#fff;color:#333;box-shadow:inset 0 0 0 2px #cfc4ab}
+.card .bt{display:flex;gap:8px;margin-top:12px}.card .bt button{flex:1;border-radius:12px;padding:10px 6px;font-weight:800;font-size:14px;white-space:nowrap;min-width:0;background:#2B3A67;color:#fff}.card .bt button.w{background:#fff;color:#333;box-shadow:inset 0 0 0 2px #cfc4ab}
 #dg{position:fixed;inset:0;z-index:40;background:#0d1124;overflow:auto;padding:calc(14px + env(safe-area-inset-top,0px)) max(14px,env(safe-area-inset-right,0px)) 30px max(14px,env(safe-area-inset-left,0px))}
 #dg h2{margin:0;font:700 22px var(--fd);color:var(--gold)}#dg .sub{color:var(--sub);font-size:13px;margin:4px 0 14px}
 #dg .x{position:fixed;right:max(14px,env(safe-area-inset-right,0px));top:calc(12px + env(safe-area-inset-top,0px));width:40px;height:40px;border-radius:50%;background:rgba(255,255,255,.1);font-size:20px}
@@ -752,10 +756,13 @@ function hit2(x,y){var b=null,bd=1e9;(M2.hits||[]).forEach(function(q){var d=Mat
 
 /* ---------- 카드 · 도감 ---------- */
 function closeCard(){var c=document.querySelector('.card');if(c)c.remove()}
+var HGCX=null,HGCXW=[];function hgcxGet(f){if(HGCX)return f(HGCX);HGCXW.push(f);if(HGCXW.length>1)return;fetch('hg_cx.json').then(function(r){return r.json()}).then(function(j){HGCX=j;HGCXW.splice(0).forEach(function(g){g(j)})}).catch(function(){HGCXW.splice(0).forEach(function(g){g(null)})})}
 function card(c,title){closeCard();var got=cxAll()[c.id],se=cxSeason(c),d=document.createElement('div');d.className='card';
- d.innerHTML='<div class="t">'+esc(title||c.ko)+'</div><div class="lab" id="clab"></div><p><b>'+esc(c.ko)+'</b> · '+esc(c.la)+'<br>'+se.s+' 저녁 하늘('+se.m+'월)에 잘 보여요 · '+(c.s&&c.s[0]?'가장 밝은 별 '+esc(c.s[0][0])+' ('+esc(c.s[0][1])+')':'어두운 별자리')+(cxNever(c)?'<br>⚠ 이 위도에서는 지평선 위로 안 떠요':'')+(got?'<br>✓ '+new Date(got.t).toLocaleDateString('ko-KR')+' '+esc(got.p||'')+'에서 찾음':'')+'</p>'
+ d.innerHTML='<div class="t">'+esc(title||c.ko)+'</div><div class="lab" id="clab"></div><p><b>'+esc(c.ko)+'</b> · <span class="ela">'+esc(c.la)+'</span><br>'+se.s+' 저녁 하늘('+se.m+'월)에 잘 보여요 · '+(c.s&&c.s[0]?'가장 밝은 별 '+esc(c.s[0][0])+' ('+esc(c.s[0][1])+')':'어두운 별자리')+(cxNever(c)?'<br>⚠ 이 위도에서는 지평선 위로 안 떠요':'')+(got?'<br>✓ '+new Date(got.t).toLocaleDateString('ko-KR')+' '+esc(got.p||'')+'에서 찾음':'')+'</p>'
   +'<div class="bt"><button id="cSay">🔊 듣기</button>'+(MODE==='map'||!got?'<button id="cGo">🧭 하늘에서 찾기</button>':'')+'<button class="w" id="cX">닫기</button></div>';
- document.body.appendChild(d);var L=HGN[c.ko];if(L)hgSvgImgs(L,'#fff1c9',function(im){var cv=hgCanvas(im,c.ko,'#ffe8a8').image;cv.style.width=Math.min(340,cv.width/2)+'px';var b=$('clab');if(b){b.innerHTML='';b.appendChild(cv)}});
+ document.body.appendChild(d);hgcxGet(function(D){var ws=D&&D[c.ko],b=$('clab');if(!ws||!b)return;var bk=46;
+  var h='<div class="hgw" style="--bk:'+bk+'px">'+ws.map(function(w){return '<div class="wd">'+w.p.map(function(q,k){return (k?'<div class="dt"><i style="height:'+Math.round(bk*1.078)+'px;display:flex;align-items:center">·</i><i style="margin-top:6px;height:18px;display:flex;align-items:center;font-size:17px">·</i></div>':'')+'<div class="sy"><div class="hb">'+q[0]+'</div><div class="en'+(w.p.length>1&&k===w.s?' st':'')+'">'+esc(q[1])+'</div></div>'}).join('')+'</div>'}).join('')+'</div>';
+  b.className='';b.innerHTML=h;var ep=d.querySelector('.ela');if(ep)ep.textContent=ws.map(function(w){return w.p.map(function(q){return q[1]}).join('·')}).join(' ')});
  $('cSay').onclick=function(){try{hgSay(c.la)}catch(e){}};$('cX').onclick=closeCard;
  if($('cGo'))$('cGo').onclick=function(){CX.go=c.id;closeCard();setMode('ar');toast('🧭 화살표를 따라 '+c.ko+' 쪽으로 폰을 돌려 보세요',3500)}}
 var DGT='전체';
@@ -901,7 +908,7 @@ requestAnimationFrame(wxLoop);
 
 setTimeout(function(){try{terrain()}catch(e){}try{satGround()}catch(e){}},600);
 tlab();sz2();build3();chips();requestAnimationFrame(loop);
-(function(){var q=new URLSearchParams(location.search),lk=q.get('look');if(q.get('off')){OFF=+q.get('off');build3()}if(!lk)return;var now=T(),L=skyLST(now,SKY.lon),aa;
+(function(){var q=new URLSearchParams(location.search),lk=q.get('look');if(q.get('card'))setTimeout(function(){var c=cxById(q.get('card'));if(c)card(c,'🌟 '+c.ko+' 발견! · 도감 10/88')},2500);if(q.get('off')){OFF=+q.get('off');build3()}if(!lk)return;var now=T(),L=skyLST(now,SKY.lon),aa;
  if(lk==='rd')aa=skyAA(+q.get('ra'),+q.get('dec'),L,SKY.lat);else if(lk==='해')aa=sunAA(now);else if(lk==='달')aa=moonAA(now);else{var pp=pxy(lk,pday(now));aa=skyAA(pp.ra,pp.dec,L,SKY.lat)}V.az=V.taz=aa[1];V.alt=V.talt=aa[0];if(q.get('tel'))telSet(+q.get('tel'))})();
 try{document.fonts.ready.then(function(){setTimeout(rebuild,50)})}catch(e){}
 if(/[?&]map/.test(location.search)){$('snd').remove();setMode('map')}else if(/[?&]sky/.test(location.search)){$('snd').remove();setMode('ar')}else autoStart();

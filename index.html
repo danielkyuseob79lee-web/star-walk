@@ -249,7 +249,13 @@ function skyLabelHg(key,col,ko){var L=HGN[key];if(!L)return null;
 
 function skyFlip(ph,only){SKYPH=ph;SKYL=SKYL.filter(function(s){return !!s.parent});SKYL.forEach(function(s){if(only&&s!==only)return;var t=ph&&s.userData.tE?s.userData.tE:s.userData.tH;if(t&&s.material.map!==t){s.material.map=t;s.material.needsUpdate=true;s.userData.fit(t)}})}
 setInterval(function(){if(!SKY.g||!SKY.g.visible||Date.now()<(skyFlip.hold||0))return;skyFlip(SKYPH?0:1)},3500);   
-function hgSay(w){try{if(!w||!window.speechSynthesis)return;var u=new SpeechSynthesisUtterance(w);u.lang='en-US';u.rate=.85;var vs=speechSynthesis.getVoices().filter(function(v){return /^en(-|_)US/i.test(v.lang)});if(vs.length)u.voice=vs[0];
+/* 🔊 발음 : 녹음한 목소리(snd/cx/이름.mp3)가 있으면 그것 · 매커조 앱 안에서는 폰 TTS · 그 밖엔 브라우저 읽어 주기 */
+var SAYREC=null,SAYA=null;try{fetch('snd/cx/list.json').then(function(r){return r.ok?r.json():null}).then(function(j){SAYREC=j}).catch(function(){})}catch(e){}
+function sayKey(w){return String(w).toLowerCase().replace(/ö/g,'o').replace(/[^a-z]+/g,'_').replace(/^_|_$/g,'')}
+function hgSay(w){try{if(!w)return;var k=sayKey(w);
+ if(SAYREC&&SAYREC.indexOf(k)>=0){try{if(SAYA)SAYA.pause()}catch(x){}SAYA=new Audio('snd/cx/'+k+'.mp3');SAYA.play().catch(function(){});return}
+ if(window.MkjTTS&&MkjTTS.speak){MkjTTS.speak(String(w),'en-US');return}
+ if(!window.speechSynthesis)return;var u=new SpeechSynthesisUtterance(w);u.lang='en-US';u.rate=.85;var vs=speechSynthesis.getVoices().filter(function(v){return /^en(-|_)US/i.test(v.lang)});if(vs.length)u.voice=vs[0];
  if(speechSynthesis.speaking||speechSynthesis.pending){speechSynthesis.cancel();setTimeout(function(){speechSynthesis.speak(u)},80)}else speechSynthesis.speak(u)}catch(e){}}
 function skyTap(cx,cy){if(!SKY.g||!SKY.g.visible||!SKY.g.userData.cons||!SKY.g.userData.cons.visible)return false;var V=new THREE.Vector3(),best=null,bd=1e9;
  SKY.g.userData.cons.traverse(function(o){if(!o.isSprite||!o.userData.lbl||!o.visible)return;var p=o.parent;while(p){if(!p.visible)return;p=p.parent}o.getWorldPosition(V);V.project(C);if(V.z>1||Math.abs(V.x)>1.1||Math.abs(V.y)>1.1)return;
@@ -454,7 +460,7 @@ function found(id){var c=cxById(id),m=cxAll();if(!c)return;m[id]={t:Date.now(),p
  var n=CXD.filter(function(x){return x.b||m[x.id]}).length;card(c,'🌟 '+c.ko+' 발견! · 도감 '+n+'/88');try{hgSay(c.la)}catch(e){}}
 
 /* ---------- 폰 방향 ---------- */
-var AR={on:0,ok:0,a:0,b:0,g:0,scr:0};
+var AR={on:0,ok:0,a:0,b:0,g:0,scr:0,hold:0,v:null,told:0};
 function arDir(){var A=AR.a*D2R,B=AR.b*D2R,G=AR.g*D2R,cA=Math.cos(A),sA=Math.sin(A),cB=Math.cos(B),sB=Math.sin(B),cG=Math.cos(G),sG=Math.sin(G);
  var x=-(cA*sG+sA*sB*cG),y=-(sA*sG-cA*sB*cG),z=-(cB*cG),o=AR.scr*D2R,co=Math.cos(o),so=Math.sin(o),x2=x*co-y*so,y2=x*so+y*co;
  return [Math.atan2(x2,y2),Math.asin(Math.max(-1,Math.min(1,z)))]}
@@ -462,7 +468,10 @@ function arEv(e){if(e.alpha==null&&e.webkitCompassHeading==null)return;if(e.type
  AR.ok=1;AR.b=e.beta||0;AR.g=e.gamma||0;try{AR.scr=(screen.orientation&&screen.orientation.angle)||window.orientation||0}catch(x){AR.scr=0}
  var d;if(e.webkitCompassHeading!=null&&e.webkitCompassHeading>=0){var hd=(e.webkitCompassHeading+(+AR.scr||0)+360)%360,al=Math.abs(AR.scr)===90?90-Math.abs(AR.g):AR.b-90;d=[hd*D2R,Math.max(-89.5,Math.min(89.5,al))*D2R]}
  else{AR.a=e.alpha;d=arDir()}
- if(!AR.on)return;V.taz=d[0];V.talt=d[1]}
+ if(!AR.on||AR.hold)return;
+ // 흔들림 잡기 : 아주 작은 떨림은 무시하고(확대할수록 더 작게), 크게 돌릴 때만 빨리 따라감
+ var n=skyPos(d[1],d[0],1);if(!AR.v){AR.v=n.clone()}else{var ang=AR.v.angleTo(n),fv=V.fov*D2R,dz=Math.max(.3*D2R,fv*.015);if(ang<dz)return;AR.v.lerp(n,Math.min(1,.1+ang/(fv*.4))).normalize()}
+ V.talt=Math.asin(Math.max(-1,Math.min(1,AR.v.y)));V.taz=Math.atan2(AR.v.x,-AR.v.z)}
 function arOn(){function go(){AR.on=1;AR.ok=0;addEventListener('deviceorientationabsolute',arEv,true);addEventListener('deviceorientation',arEv,true);chips();
   setTimeout(function(){if(AR.on&&!AR.ok){AR.on=0;chips();toast('이 기기는 방향 센서가 없어요 · 손가락으로 끌어 둘러보세요',3500)}},2500)}
  if(typeof DeviceOrientationEvent!=='undefined'&&DeviceOrientationEvent.requestPermission)DeviceOrientationEvent.requestPermission().then(function(r){if(r==='granted')go();else toast('방향 센서를 허락해 주세요')}).catch(go);else go()}
@@ -594,7 +603,9 @@ function tguide(){var cv=$('tguide');if(!TGc){TGc=cv.getContext('2d')}var w=inne
   x.fillStyle='#ffe2a0';x.fillText(out.it.n+' · '+ds,ex-dx*26,ey-dy*26+4)}}
 function telFov(){var mx=TEL.pro?0.0008:0.55;   // PRO 끝 = 제임스웹 해상도(0.03″/화소) 수준
 return 62*Math.pow(mx/62,TEL.t)}
-function telApply(){var on=TEL.t>0.02,f=telFov();V.fov=on?f:62;var vis=V.fov<15;
+function telApply(){var on=TEL.t>0.02,f=telFov();
+ // 🔭 망원경을 쓰는 동안은 폰 방향을 따라가지 않고 멈춤 (손 떨림 없이) · 손가락으로 조금씩 옮김 · 다시 줄이면 폰 방향으로
+ var hd=!!(on&&AR.on);if(hd!==!!AR.hold){AR.hold=hd?1:0;AR.v=null;if(hd&&!AR.told){AR.told=1;toast('🔭 망원경을 쓰는 동안은 화면이 멈춰요 · 손가락으로 살살 끌어 옮겨요 · 다시 줄이면 폰 방향으로',3800)}}V.fov=on?f:62;var vis=V.fov<15;
  if(vis!==TEL.on){TEL.on=vis;var mine=TEL.discs.concat(TEL.moons,TEL.moonM?[TEL.moonM]:[],DSOM,TEL.sunD?[TEL.sunD]:[]);
   G3&&G3.traverse(function(o){if(mine.indexOf(o)>=0)return;if(o.isSprite||(o.isMesh&&o!==G3)){if(vis){o.userData.vis0=o.visible;o.visible=false}else if(o.userData.vis0!=null)o.visible=o.userData.vis0}});
   TEL.discs.concat(TEL.moons).forEach(function(o){o.visible=vis});if(TEL.moonM)TEL.moonM.visible=true;MWU.uOp.value=vis?0:.85}
@@ -705,7 +716,7 @@ var PT={},pinch0=0,fov0=62,z0=1;
 function ptDown(e){PT[e.pointerId]={x:e.clientX,y:e.clientY,x0:e.clientX,y0:e.clientY,t:Date.now()};var ks=Object.keys(PT);if(ks.length===2){TEL.t0=TEL.t;var a=PT[ks[0]],b=PT[ks[1]];pinch0=Math.hypot(a.x-b.x,a.y-b.y);fov0=V.fov;z0=M2.z;M2.r0=M2.rot;M2.a0=Math.atan2(b.y-a.y,b.x-a.x)}}
 function ptMove(e){var p=PT[e.pointerId];if(!p)return;var dx=e.clientX-p.x,dy=e.clientY-p.y;p.x=e.clientX;p.y=e.clientY;var ks=Object.keys(PT);
  if(ks.length===2){var a=PT[ks[0]],b=PT[ks[1]],d=Math.hypot(a.x-b.x,a.y-b.y);if(MODE==='ar'){telSet(TEL.t0+Math.log(d/pinch0)/Math.log(62/(TEL.pro?0.0008:0.55))*1.6)}else{M2.z=Math.max(1,Math.min(4,z0*d/pinch0));M2.rot=M2.r0+(Math.atan2(b.y-a.y,b.x-a.x)-M2.a0);draw2()}return}
- if(MODE==='ar'){if(AR.on)return;var k=V.fov/innerHeight*D2R*1.1;V.taz-=dx*k;V.talt=Math.max(-1.2,Math.min(1.5,V.talt+dy*k));}
+ if(MODE==='ar'){if(AR.on&&!AR.hold)return;var k=V.fov/innerHeight*D2R*1.1;V.taz-=dx*k;V.talt=Math.max(-1.2,Math.min(1.5,V.talt+dy*k));}
  else{if(M2.z>1.02){M2.px+=dx;M2.py+=dy}else{var cx=innerWidth/2,cy=M2.cy,a1=Math.atan2(p.y-dy-cy,p.x-dx-cx),a2=Math.atan2(p.y-cy,p.x-cx);M2.rot+=a2-a1}draw2()}}
 function ptUp(e){var p=PT[e.pointerId];delete PT[e.pointerId];if(!p)return;if(Math.hypot(p.x-p.x0,p.y-p.y0)<8&&Date.now()-p.t<400)tap(p.x,p.y)}
 ['v3','v2'].forEach(function(id){var el=$(id);el.addEventListener('pointerdown',ptDown);el.addEventListener('pointermove',ptMove);el.addEventListener('pointerup',ptUp);el.addEventListener('pointercancel',ptUp);
@@ -821,7 +832,7 @@ if(/[?&]pro=1/.test(location.search)){TEL.pro=true;try{localStorage.setItem('sta
 /* 그리기 고리 */
 var last=performance.now();
 function loop(now){requestAnimationFrame(loop);var dt=Math.min(.1,(now-last)/1000);last=now;if(MODE!=='ar')return;
- var _q0=G3?G3.quaternion.clone():null;skySpin();if(_q0&&G3&&V.fov<1.5&&!AR.on){var dq=G3.quaternion.clone().multiply(_q0.invert());[['az','alt'],['taz','talt']].forEach(function(k){var v=skyPos(V[k[1]],V[k[0]],1).applyQuaternion(dq);V[k[1]]=Math.asin(Math.max(-1,Math.min(1,v.y)));V[k[0]]=Math.atan2(v.x,-v.z)})}telApply();telSeeing(now);dsoTick();tname();tguide();var da=((V.taz-V.az+Math.PI*3)%(Math.PI*2))-Math.PI,k=1-Math.exp(-dt*(AR.on?5.5:14));V.az+=da*k;V.alt+=(V.talt-V.alt)*k;camUpd();cxTick(dt);R3.autoClear=true;R3.setScissorTest(false);R3.setViewport(0,0,innerWidth,innerHeight);R3.render(S,C);
+ var _q0=G3?G3.quaternion.clone():null;skySpin();if(_q0&&G3&&V.fov<1.5&&(!AR.on||AR.hold)){var dq=G3.quaternion.clone().multiply(_q0.invert());[['az','alt'],['taz','talt']].forEach(function(k){var v=skyPos(V[k[1]],V[k[0]],1).applyQuaternion(dq);V[k[1]]=Math.asin(Math.max(-1,Math.min(1,v.y)));V[k[0]]=Math.atan2(v.x,-v.z)})}telApply();telSeeing(now);dsoTick();tname();tguide();var da=((V.taz-V.az+Math.PI*3)%(Math.PI*2))-Math.PI,k=1-Math.exp(-dt*(AR.on?5.5:14));V.az+=da*k;V.alt+=(V.talt-V.alt)*k;camUpd();cxTick(dt);R3.autoClear=true;R3.setScissorTest(false);R3.setViewport(0,0,innerWidth,innerHeight);R3.render(S,C);
  if(TEL.t>0.02)return;
  var cw=Math.min(innerWidth*.42,230),ch=cw*1.25,cx=(innerWidth-cw)/2,cy=innerWidth>=900?92:160;   // 아래 가운데 (조작 줄 위)
  var turn=da*k/Math.max(dt,.001);TURN+=(Math.max(-1,Math.min(1,turn*.25))-TURN)*Math.min(1,dt*6);ME.rotation.y=Math.PI-TURN*.5;

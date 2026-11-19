@@ -69,6 +69,10 @@ button{font:inherit;color:inherit;border:0;background:none;cursor:pointer;paddin
 #glare{position:fixed;left:50%;top:50%;width:0;height:0;z-index:4;pointer-events:none;opacity:0}#glare:before{content:'';position:absolute;left:-46vmax;top:-46vmax;width:92vmax;height:92vmax;border-radius:50%;background:radial-gradient(circle,rgba(255,255,250,1) 0,rgba(255,250,225,.95) 3%,rgba(255,236,170,.55) 9%,rgba(255,220,140,.18) 25%,rgba(255,210,130,0) 60%);animation:sunb 2.4s ease-in-out infinite alternate}
 @keyframes sunb{from{transform:scale(.94) rotate(0)}to{transform:scale(1.06) rotate(8deg)}}
 #scope.solar:before{content:'';position:absolute;inset:0;background:rgba(255,120,20,.22);mix-blend-mode:multiply}#solb{position:absolute;left:50%;bottom:calc(50% - var(--R) - 34px);transform:translateX(-50%);background:rgba(40,16,0,.85);color:#ffb35c;font-size:12.5px;font-weight:800;padding:5px 12px;border-radius:99px;box-shadow:inset 0 0 0 1px rgba(255,150,60,.6);display:none;white-space:nowrap}#scope.solar #solb{display:block}
+#stick{position:fixed;left:max(14px,env(safe-area-inset-left,0px));bottom:calc(196px + env(safe-area-inset-bottom,0px));z-index:11;width:96px;height:96px;border-radius:50%;background:rgba(10,14,28,.55);box-shadow:inset 0 0 0 1px var(--line),0 4px 14px rgba(0,0,0,.35);touch-action:none}
+#stick:before{content:"";position:absolute;inset:8px;border-radius:50%;border:1px dashed rgba(255,255,255,.18)}
+#stick i{position:absolute;left:50%;top:50%;width:42px;height:42px;margin:-21px 0 0 -21px;border-radius:50%;background:radial-gradient(circle at 40% 35%,#fff3c4,#FFD76A 60%,#c99a2e);box-shadow:0 2px 8px rgba(0,0,0,.5)}
+#stick b{position:absolute;left:0;right:0;bottom:-20px;text-align:center;font-size:11px;font-weight:800;color:var(--sub);white-space:nowrap}
 #scope{position:fixed;inset:0;z-index:5;pointer-events:none;--R:min(44vw,40vh)}
 #scope .fs{position:absolute;inset:0;background:radial-gradient(circle at 50% 50%,transparent 0,transparent calc(var(--R) - 14px),rgba(0,0,0,.55) calc(var(--R) - 5px),#000 calc(var(--R) + 1px),#000 100%)}   /* 시야 조리개 : 가장자리가 살짝 흐려지는 진짜 접안렌즈 느낌 */
 #scope .rim{position:absolute;left:50%;top:50%;width:calc(var(--R)*2 + 46px);height:calc(var(--R)*2 + 46px);transform:translate(-50%,-50%);border-radius:50%;
@@ -81,9 +85,9 @@ button{font:inherit;color:inherit;border:0;background:none;cursor:pointer;paddin
 #tname{position:absolute;left:50%;top:calc(50% - var(--R) - 8px);transform:translate(-50%,-100%);display:flex;flex-direction:column;align-items:center;gap:2px;pointer-events:none}#tname img{height:min(13vh,96px);border-radius:12px}#tname span{font:700 13px var(--f);color:var(--gold);text-shadow:0 1px 3px #000}
 #scope .glint{position:absolute;left:50%;top:50%;width:calc(var(--R)*2);height:calc(var(--R)*2);transform:translate(-50%,-50%);border-radius:50%;
  background:radial-gradient(ellipse 40% 22% at 30% 18%,rgba(160,190,255,.07),transparent 70%),radial-gradient(circle at 50% 50%,transparent 70%,rgba(90,120,200,.06) 92%,transparent 100%);box-shadow:inset 0 0 50px rgba(0,0,0,.85)}   /* 렌즈 코팅 빛 반사 · 안쪽 그늘 */
-#tel{position:fixed;right:max(10px,env(safe-area-inset-right,0px));top:50%;transform:translateY(-50%);z-index:11;display:flex;flex-direction:column;align-items:center;gap:8px;touch-action:none}
+#tel{position:fixed;right:max(10px,env(safe-area-inset-right,0px));bottom:calc(230px + env(safe-area-inset-bottom,0px));z-index:11;display:flex;flex-direction:column;align-items:center;gap:8px;touch-action:none}
 #tel>span:first-child{font-size:20px}#tmag{position:absolute;top:calc(100% + 6px);left:50%;transform:translateX(-50%);white-space:nowrap;text-align:center;font-size:12px;font-weight:800;color:var(--gold);line-height:1.25;text-shadow:0 1px 3px #000}
-#ttrack{position:relative;width:34px;height:min(38vh,280px);border-radius:99px;background:rgba(10,14,28,.7);box-shadow:inset 0 0 0 1px var(--line);touch-action:none;cursor:ns-resize}
+#ttrack{position:relative;width:34px;height:min(30vh,230px);border-radius:99px;background:rgba(10,14,28,.7);box-shadow:inset 0 0 0 1px var(--line);touch-action:none;cursor:ns-resize}
 #tfill{position:absolute;left:12px;right:12px;bottom:12px;border-radius:99px;background:linear-gradient(var(--gold),#b8862a)}
 #tknob{position:absolute;left:3px;width:28px;height:28px;border-radius:50%;background:#fff6dc;box-shadow:0 2px 8px rgba(0,0,0,.5)}
 #tgB{background:rgba(10,14,28,.7);box-shadow:inset 0 0 0 1px var(--line);border-radius:12px;padding:5px 6px;font-size:15px;line-height:1.1;color:var(--gold)}#tgB small{font-size:9.5px;font-weight:800}#tgB.off{color:#6d7795;text-decoration:line-through}
@@ -95,7 +99,7 @@ button{font:inherit;color:inherit;border:0;background:none;cursor:pointer;paddin
 #snd .sb{width:min(100%,380px);background:rgba(12,16,34,.92);border-radius:22px;padding:20px;text-align:center;box-shadow:0 10px 40px rgba(0,0,0,.6),inset 0 0 0 1px var(--line)}
 #snd h2{margin:0 0 4px;font:700 22px var(--fd);color:var(--gold)}#snd p{margin:0 0 14px;color:var(--sub);font-size:14px}
 #snd button{display:block;width:100%;margin-top:8px;border-radius:14px;padding:14px;font-weight:800;font-size:16px;background:var(--gold);color:#1b1406}#snd button.w{background:rgba(255,255,255,.08);color:var(--ink);box-shadow:inset 0 0 0 1px var(--line)}
-@media (min-width:900px){.bot{flex-direction:row;align-items:center}.time{flex:1;max-width:560px}.hint{text-align:left}}
+@media (min-width:900px){#stick{bottom:130px}#tel{bottom:150px}.bot{flex-direction:row;align-items:center}.time{flex:1;max-width:560px}.hint{text-align:left}}
 </style></head>
 <body>
 <div id="v3"></div><canvas id="v2" hidden></canvas>
@@ -103,7 +107,7 @@ button{font:inherit;color:inherit;border:0;background:none;cursor:pointer;paddin
  <div class="seg"><button data-m="ar" class="on">하늘 비추기</button><button data-m="map">별자리판</button></div>
  <button class="ib" id="bMu" title="음악">♪</button><button class="ib" id="bDg" title="도감">📖</button></div><div id="mupop" hidden><button id="muT">🔊</button><input type="range" id="muV" min="0" max="100" step="1"><span id="muN"></span></div>
 <div id="snd"><div class="sb"><h2>✦ 스타윈도우</h2><div style="font-size:12px;letter-spacing:3px;color:var(--sub);margin:-4px 0 8px;font-weight:700">STARWINDOW</div><p>오늘 밤 내 머리 위 하늘이에요</p><button id="sOn">🔊 소리 켜고 시작</button><button class="w" id="sOff">🔇 소리 없이 시작</button></div></div>
-<div id="scope" hidden><div class="fs"></div><div class="rim"></div><div class="glint"></div><div class="knurl"></div><div id="tname"></div></div><div id="tel"><button id="tgB" title="길잡이 선">〰<br><small>길잡이</small></button><span>🔭</span><div id="ttrack"><i id="tfill"></i><b id="tknob"></b></div><span id="tmag"></span><button id="tlock" hidden>PRO<br>더 당기기</button></div>
+<div id="scope" hidden><div class="fs"></div><div class="rim"></div><div class="glint"></div><div class="knurl"></div><div id="tname"></div></div><div id="stick"><i></i><b>미세 조정</b></div><div id="tel"><button id="tgB" title="길잡이 선">〰<br><small>길잡이</small></button><span>🔭</span><div id="ttrack"><i id="tfill"></i><b id="tknob"></b></div><span id="tmag"></span><button id="tlock" hidden>PRO<br>더 당기기</button></div>
 <canvas id="tguide" style="position:fixed;inset:0;z-index:6;pointer-events:none"></canvas><div id="ring" hidden></div><div id="tgt" hidden></div><div id="arw" hidden><i></i><b></b></div>
 <div class="bot">
  <div class="row" id="chips"></div>
@@ -461,7 +465,16 @@ function found(id){var c=cxById(id),m=cxAll();if(!c)return;m[id]={t:Date.now(),p
  var n=CXD.filter(function(x){return x.b||m[x.id]}).length;card(c,'🌟 '+c.ko+' 발견! · 도감 '+n+'/88');try{hgSay(c.la)}catch(e){}}
 
 /* ---------- 폰 방향 ---------- */
-var AR={on:0,ok:0,a:0,b:0,g:0,scr:0,hold:0,v:null,told:0};
+var AR={on:0,ok:0,a:0,b:0,g:0,scr:0,hold:0,v:null,told:0,dAz:0,dAlt:0,raz:0,ralt:0};
+var SENS=1;try{var _s=localStorage.getItem('star_sens');if(_s!=null)SENS=Math.max(0,Math.min(2,+_s))}catch(e){}
+/* 폰 방향 → 화면 : 맨눈일 땐 폰이 가리키는 곳 그대로(현실감) · 🔭 망원경일 땐 배율이 클수록 폰 움직임을 줄여서 따라감 (손떨림에 달이 안 빠져나가게) */
+function arApply(){var paz=AR.raz,pal=AR.ralt;
+ if(TEL.t>0.02){var s=[.6,1,1.5][SENS]*Math.max(.08,Math.min(1,Math.pow(V.fov/62,.32)));
+  if(!AR.anc||Math.abs(s-AR.anc.s)>.03)AR.anc={pa:paz,pl:pal,va:(AR.anc?AR.anc.va+wrapPi(paz-AR.anc.pa)*AR.anc.s:paz),vl:(AR.anc?AR.anc.vl+(pal-AR.anc.pl)*AR.anc.s:pal),s:s};
+  var A=AR.anc;
+  paz=A.va+wrapPi(paz-A.pa)*A.s;pal=Math.max(-1.4,Math.min(1.5,A.vl+(pal-A.pl)*A.s))}else AR.anc=null;
+ V.taz=paz+AR.dAz;V.talt=Math.max(-1.4,Math.min(1.5,pal+AR.dAlt))}
+function wrapPi(a){return ((a+Math.PI*3)%(Math.PI*2))-Math.PI}
 function arDir(){var A=AR.a*D2R,B=AR.b*D2R,G=AR.g*D2R,cA=Math.cos(A),sA=Math.sin(A),cB=Math.cos(B),sB=Math.sin(B),cG=Math.cos(G),sG=Math.sin(G);
  var x=-(cA*sG+sA*sB*cG),y=-(sA*sG-cA*sB*cG),z=-(cB*cG),o=AR.scr*D2R,co=Math.cos(o),so=Math.sin(o),x2=x*co-y*so,y2=x*so+y*co;
  return [Math.atan2(x2,y2),Math.asin(Math.max(-1,Math.min(1,z)))]}
@@ -470,10 +483,14 @@ function arEv(e){if(e.alpha==null&&e.webkitCompassHeading==null)return;if(e.type
  var d;if(e.webkitCompassHeading!=null&&e.webkitCompassHeading>=0){var hd=(e.webkitCompassHeading+(+AR.scr||0)+360)%360,al=Math.abs(AR.scr)===90?90-Math.abs(AR.g):AR.b-90;d=[hd*D2R,Math.max(-89.5,Math.min(89.5,al))*D2R]}
  else{AR.a=e.alpha;d=arDir()}
  if(!AR.on||AR.hold)return;
- // 흔들림 잡기 : 아주 작은 떨림은 무시하고(확대할수록 더 작게), 크게 돌릴 때만 빨리 따라감
- var n=skyPos(d[1],d[0],1);if(!AR.v){AR.v=n.clone()}else{var ang=AR.v.angleTo(n),fv=V.fov*D2R,dz=Math.max(.9*D2R,fv*.03);if(ang<dz)return;AR.v.lerp(n,Math.min(1,.05+ang/(fv*1.2))).normalize()}
- V.talt=Math.asin(Math.max(-1,Math.min(1,AR.v.y)));V.taz=Math.atan2(AR.v.x,-AR.v.z)}
-function arOn(){function go(){AR.on=1;AR.ok=0;addEventListener('deviceorientationabsolute',arEv,true);addEventListener('deviceorientation',arEv,true);chips();
+ // 흔들림 잡기 (원-유로 필터) : 가만히 들고 있을 땐 떨림을 강하게 눌러 주고, 빠르게 돌릴 땐 바로 따라감 · 감도 설정에 따라 더 무겁게
+ var n=skyPos(d[1],d[0],1),tn=performance.now();
+ if(!AR.v){AR.v=n.clone();AR.tv=tn;AR.sp=0}else{var dt=Math.max(.008,Math.min(.2,(tn-AR.tv)/1000));AR.tv=tn;
+  var ang=AR.v.angleTo(n),vel=ang/dt;AR.sp+=(vel-AR.sp)*Math.min(1,dt*8);   // 돌리는 속도 (라디안/초, 부드럽게)
+  var mc=[.25,.45,.8][SENS],fc=mc+(SENS===0?.6:1.2)*AR.sp*R2D/10,a=1-Math.exp(-2*Math.PI*fc*dt);   // 차단 주파수: 느리게 돌리면 낮게 · 빠르면 높게
+  if(ang>25*D2R)a=1;AR.v.lerp(n,a).normalize()}
+ AR.ralt=Math.asin(Math.max(-1,Math.min(1,AR.v.y)));AR.raz=Math.atan2(AR.v.x,-AR.v.z);arApply()}
+function arOn(){function go(){AR.on=1;AR.dAz=0;AR.dAlt=0;AR.ok=0;addEventListener('deviceorientationabsolute',arEv,true);addEventListener('deviceorientation',arEv,true);chips();
   setTimeout(function(){if(AR.on&&!AR.ok){AR.on=0;chips();toast('이 기기는 방향 센서가 없어요 · 손가락으로 끌어 둘러보세요',3500)}},2500)}
  if(typeof DeviceOrientationEvent!=='undefined'&&DeviceOrientationEvent.requestPermission)DeviceOrientationEvent.requestPermission().then(function(r){if(r==='granted')go();else toast('방향 센서를 허락해 주세요')}).catch(go);else go()}
 function arOff(){AR.on=0;removeEventListener('deviceorientationabsolute',arEv,true);removeEventListener('deviceorientation',arEv,true);chips()}
@@ -519,14 +536,18 @@ var TEXF={'수성':'mercurymap.jpg','금성':'venusmap.jpg','화성':'marsmap2k.
 function tex(f){if(!TEXC[f]){TEXC[f]=TLD.load('tex/'+f);TEXC[f].anisotropy=8}return TEXC[f]}
 var POLE={'수성':[281.01,61.42],'금성':[272.76,67.16],'화성':[317.68,52.89],'목성':[268.06,64.50],'토성':[40.59,83.54],'천왕성':[257.31,-15.18],'해왕성':[299.36,43.46],'달':[270,66.5]};   // 자전축 (적경°, 적위°)
 var ROT={'목성':9.925,'토성':10.656,'화성':24.623,'천왕성':-17.24,'해왕성':16.11,'금성':-5832.5,'수성':1407.6};                                                                              // 자전 주기(시간)
-function moonMat(t){return new THREE.ShaderMaterial({uniforms:{map:{value:t},uL:{value:new THREE.Vector3(1,0,0)},uS:{value:new THREE.Vector3(0,0,-1)},uU:{value:.0122},uP:{value:.0215}},depthTest:false,depthWrite:false,
+var MDU={dTex:{value:null},dB:{value:new THREE.Vector4(0,0,0,0)},dOn:{value:0}};
+function moonMat(t){return new THREE.ShaderMaterial({uniforms:{dTex:MDU.dTex,dB:MDU.dB,dOn:MDU.dOn,map:{value:t},uL:{value:new THREE.Vector3(1,0,0)},uS:{value:new THREE.Vector3(0,0,-1)},uU:{value:.0122},uP:{value:.0215}},depthTest:false,depthWrite:false,
  vertexShader:'varying vec3 vN;varying vec2 vU;varying vec3 vW;void main(){vU=uv;vN=normalize(mat3(modelMatrix)*normal);vW=(modelMatrix*vec4(position,1.0)).xyz;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.0);}',
- fragmentShader:'uniform sampler2D map;uniform vec3 uL;uniform vec3 uS;uniform float uU;uniform float uP;varying vec3 vN;varying vec2 vU;varying vec3 vW;void main(){vec3 c=texture2D(map,vU).rgb;float d=dot(normalize(vN),uL);float k=smoothstep(-.03,.12,d)*max(d,0.)+.02;'+
+ fragmentShader:'uniform sampler2D map;uniform sampler2D dTex;uniform vec4 dB;uniform float dOn;uniform vec3 uL;uniform vec3 uS;uniform float uU;uniform float uP;varying vec3 vN;varying vec2 vU;varying vec3 vW;void main(){vec3 c=texture2D(map,vU).rgb;'+
+  'if(dOn>0.0){vec2 q=(vU-dB.xy)/(dB.zw-dB.xy);if(q.x>0.0&&q.x<1.0&&q.y>0.0&&q.y<1.0){float e=smoothstep(0.0,.06,q.x)*smoothstep(0.0,.06,q.y)*smoothstep(0.0,.06,1.0-q.x)*smoothstep(0.0,.06,1.0-q.y);vec3 cd=texture2D(dTex,vec2(q.x,q.y)).rgb*1.12;c=mix(c,cd,dOn*e);}}'+
+  'float d=dot(normalize(vN),uL);float k=smoothstep(-.03,.12,d)*max(d,0.)+.02;'+
   'float a=acos(clamp(dot(normalize(vW),uS),-1.0,1.0));float pen=smoothstep(uP,uU,a);float umb=smoothstep(uU*1.03,uU*.97,a);'+   // 지구 그림자 : 반그림자는 어둡게, 본그림자는 붉게
   'vec3 col=c*k*1.15*(1.0-.55*pen);col=mix(col,c*vec3(.55,.18,.08)*.55*smoothstep(-.2,.2,d+.3),umb);gl_FragColor=vec4(col,1.0);}'})}
-function bodyMat(t,ring){return new THREE.ShaderMaterial({uniforms:{map:{value:t},uL:{value:new THREE.Vector3(1,0,0)},uA:{value:ring?.35:.025}},transparent:!!ring,depthTest:false,depthWrite:false,side:ring?THREE.DoubleSide:THREE.FrontSide,
- vertexShader:'varying vec3 vN;varying vec2 vU;void main(){vU=uv;vN=normalize(mat3(modelMatrix)*normal);gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.0);}',
- fragmentShader:ring?'uniform sampler2D map;uniform vec3 uL;uniform float uA;varying vec3 vN;varying vec2 vU;void main(){vec4 c=texture2D(map,vU);float d=abs(dot(vN,uL));gl_FragColor=vec4(c.rgb*(uA+.9*d)*1.25,c.a);}'
+function bodyMat(t,ring){return new THREE.ShaderMaterial({uniforms:{map:{value:t},uL:{value:new THREE.Vector3(1,0,0)},uA:{value:ring?.35:.025},uF:{value:1}},transparent:!!ring,depthTest:false,depthWrite:false,side:ring?THREE.DoubleSide:THREE.FrontSide,
+ vertexShader:ring?'varying vec3 vN;varying vec2 vU;varying vec3 vW;varying vec3 vC;void main(){vU=uv;vN=normalize(mat3(modelMatrix)*normal);vW=(modelMatrix*vec4(position,1.0)).xyz;vC=modelMatrix[3].xyz;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.0);}'
+  :'varying vec3 vN;varying vec2 vU;void main(){vU=uv;vN=normalize(mat3(modelMatrix)*normal);gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.0);}',
+ fragmentShader:ring?'uniform sampler2D map;uniform vec3 uL;uniform float uA;uniform float uF;varying vec3 vN;varying vec2 vU;varying vec3 vW;varying vec3 vC;void main(){float fr=dot(vW-vC,normalize(cameraPosition-vC));if(uF>0.5?fr<0.0:fr>=0.0)discard;vec4 c=texture2D(map,vU);float d=abs(dot(vN,uL));gl_FragColor=vec4(c.rgb*(uA+.9*d)*1.25,c.a);}'
   :'uniform sampler2D map;uniform vec3 uL;uniform float uA;varying vec3 vN;varying vec2 vU;void main(){vec3 c=texture2D(map,vU).rgb;float d=dot(normalize(vN),uL);float k=smoothstep(-.03,.12,d)*max(d,0.)*1.0+uA;gl_FragColor=vec4(c*k*1.15,1.0);}'})}
 function orient(m,nm,pos,L,lat,hours){var P=POLE[nm]||[0,90],pa=skyAA(P[0]/15,P[1],L,lat),pole=skyPos(pa[0],pa[1],1).normalize(),q=new THREE.Quaternion().setFromUnitVectors(new THREE.Vector3(0,1,0),pole);
  var lx=new THREE.Vector3(1,0,0).applyQuaternion(q),to=pos.clone().negate().normalize();to.addScaledVector(pole,-to.dot(pole)).normalize();
@@ -554,7 +575,9 @@ function telBuild(G,now,L,lat){TEL.discs=[];TEL.moons=[];TEL.moonM=null;var dd=p
   if(pn==='토성'){var rg=new THREE.RingGeometry(rad*1.12,rad*2.36,160,1),uv=rg.attributes.uv,ps=rg.attributes.position;
    for(var i=0;i<uv.count;i++){var x=ps.getX(i)/(rad*2.36),y=ps.getY(i)/(rad*2.36);uv.setXY(i,.25+x*.25*.985,.5+y*.5*.985)}
    var rm=new THREE.Mesh(rg,bodyMat(tex('saturnringcolortrans.png'),1));rm.material.uniforms.uL.value.copy(lt);rm.position.copy(q);
-   var P=POLE['토성'],pa=skyAA(P[0]/15,P[1],L,lat),pole=skyPos(pa[0],pa[1],1).normalize();rm.quaternion.setFromUnitVectors(new THREE.Vector3(0,0,1),pole);rm.renderOrder=9;rm.visible=false;rm.userData.of='토성';G.add(rm);TEL.discs.push(rm)}
+   var P=POLE['토성'],pa=skyAA(P[0]/15,P[1],L,lat),pole=skyPos(pa[0],pa[1],1).normalize();rm.quaternion.setFromUnitVectors(new THREE.Vector3(0,0,1),pole);rm.renderOrder=9;rm.visible=false;rm.userData.of='토성';G.add(rm);TEL.discs.push(rm);
+   // 고리 뒤쪽 반은 토성 뒤에 그림 (앞쪽 반만 토성을 가림)
+   var rb=new THREE.Mesh(rg,bodyMat(tex('saturnringcolortrans.png'),1));rb.material.uniforms.uL.value.copy(lt);rb.material.uniforms.uF.value=0;rb.position.copy(q);rb.quaternion.copy(rm.quaternion);rb.renderOrder=7;rb.visible=false;rb.userData.of='토성';G.add(rb);TEL.discs.push(rb)}
   try{satBuild(G,pn,pp,q,rad,lt,L,lat,now)}catch(e){console.warn('sat',e)}}
  try{if(sa[0]>-0.08){var sd=new THREE.Mesh(new THREE.CircleGeometry(RS*.9*Math.tan(.2665*D2R),96),new THREE.MeshBasicMaterial({map:sunTex(now),depthTest:false,depthWrite:false}));sd.userData.nm='해';sd.position.copy(SUNW.clone().multiplyScalar(RS*.9));sd.lookAt(0,0,0);sd.renderOrder=6;G.add(sd);TEL.sunD=sd}}catch(e){}
  // 달 : 언제나 진짜 크기(0.52°) · 햇빛 방향으로 위상
@@ -607,7 +630,8 @@ function telFov(){var mx=TEL.pro?0.0008:0.55;   // PRO 끝 = 제임스웹 해상
 return 62*Math.pow(mx/62,TEL.t)}
 function telApply(){var on=TEL.t>0.02,f=telFov();
  // 🔭 망원경을 쓰는 동안은 폰 방향을 따라가지 않고 멈춤 (손 떨림 없이) · 손가락으로 조금씩 옮김 · 다시 줄이면 폰 방향으로
- var hd=!!(on&&AR.on);if(hd!==!!AR.hold){AR.hold=hd?1:0;AR.v=null;if(hd&&!AR.told){AR.told=1;toast('🔭 망원경을 쓰는 동안은 화면이 멈춰요 · 손가락으로 살살 끌어 옮겨요 · 다시 줄이면 폰 방향으로',3800)}}V.fov=on?f:62;var vis=V.fov<15;
+ var hd=false;   // 망원경도 폰을 따라 움직임 (진짜처럼) · 대신 아래에서 부드럽게 잡음
+if(hd!==!!AR.hold){AR.hold=hd?1:0;AR.v=null;if(hd&&!AR.told){AR.told=1;toast('🔭 망원경을 쓰는 동안은 화면이 멈춰요 · 손가락으로 살살 끌어 옮겨요 · 다시 줄이면 폰 방향으로',3800)}}V.fov=on?f:62;var vis=V.fov<15;
  if(vis!==TEL.on){TEL.on=vis;var mine=TEL.discs.concat(TEL.moons,TEL.moonM?[TEL.moonM]:[],DSOM,TEL.sunD?[TEL.sunD]:[]);
   G3&&G3.traverse(function(o){if(mine.indexOf(o)>=0)return;if(o.isSprite||(o.isMesh&&o!==G3)){if(vis){o.userData.vis0=o.visible;o.visible=false}else if(o.userData.vis0!=null)o.visible=o.userData.vis0}});
   TEL.discs.concat(TEL.moons).forEach(function(o){o.visible=vis});if(TEL.moonM)TEL.moonM.visible=true;MWU.uOp.value=vis?0:.85}
@@ -718,7 +742,7 @@ var PT={},pinch0=0,fov0=62,z0=1;
 function ptDown(e){PT[e.pointerId]={x:e.clientX,y:e.clientY,x0:e.clientX,y0:e.clientY,t:Date.now()};var ks=Object.keys(PT);if(ks.length===2){TEL.t0=TEL.t;var a=PT[ks[0]],b=PT[ks[1]];pinch0=Math.hypot(a.x-b.x,a.y-b.y);fov0=V.fov;z0=M2.z;M2.r0=M2.rot;M2.a0=Math.atan2(b.y-a.y,b.x-a.x)}}
 function ptMove(e){var p=PT[e.pointerId];if(!p)return;var dx=e.clientX-p.x,dy=e.clientY-p.y;p.x=e.clientX;p.y=e.clientY;var ks=Object.keys(PT);
  if(ks.length===2){var a=PT[ks[0]],b=PT[ks[1]],d=Math.hypot(a.x-b.x,a.y-b.y);if(MODE==='ar'){telSet(TEL.t0+Math.log(d/pinch0)/Math.log(62/(TEL.pro?0.0008:0.55))*1.6)}else{M2.z=Math.max(1,Math.min(4,z0*d/pinch0));M2.rot=M2.r0+(Math.atan2(b.y-a.y,b.x-a.x)-M2.a0);draw2()}return}
- if(MODE==='ar'){if(AR.on&&!AR.hold)return;var k=V.fov/innerHeight*D2R*1.1;V.taz-=dx*k;V.talt=Math.max(-1.2,Math.min(1.5,V.talt+dy*k));}
+ if(MODE==='ar'){var k=V.fov/innerHeight*D2R*1.1;if(AR.on&&!AR.hold){AR.dAz-=dx*k;AR.dAlt=Math.max(-1.4,Math.min(1.4,AR.dAlt+dy*k));arApply();return}V.taz-=dx*k;V.talt=Math.max(-1.2,Math.min(1.5,V.talt+dy*k));}
  else{if(M2.z>1.02){M2.px+=dx;M2.py+=dy}else{var cx=innerWidth/2,cy=M2.cy,a1=Math.atan2(p.y-dy-cy,p.x-dx-cx),a2=Math.atan2(p.y-cy,p.x-cx);M2.rot+=a2-a1}draw2()}}
 function ptUp(e){var p=PT[e.pointerId];delete PT[e.pointerId];if(!p)return;if(Math.hypot(p.x-p.x0,p.y-p.y0)<8&&Date.now()-p.t<400)tap(p.x,p.y)}
 ['v3','v2'].forEach(function(id){var el=$(id);el.addEventListener('pointerdown',ptDown);el.addEventListener('pointermove',ptMove);el.addEventListener('pointerup',ptUp);el.addEventListener('pointercancel',ptUp);
@@ -796,11 +820,13 @@ function shape(c,ok){var P=[];c.L.forEach(function(pl){pl.forEach(function(q){P.
 /* ---------- 위치 · 시간 · 단추 ---------- */
 function locate(){if(!navigator.geolocation){toast('위치를 알 수 없어요');return}toast('📍 내 자리 찾는 중…');
  navigator.geolocation.getCurrentPosition(function(p){SKY.lat=p.coords.latitude;SKY.lon=p.coords.longitude;SKY.got=1;SKY.src='내 자리('+SKY.lat.toFixed(1)+'°N '+SKY.lon.toFixed(1)+'°E)';llSave();rebuild();chips();toast('📍 내 자리 하늘로 바꿨어요')},function(e){var c=e&&e.code;toast(c===1?'📍 위치 허용이 꺼져 있어요 · 브라우저(또는 폰) 설정에서 이 사이트 위치를 허용하면 내 자리 하늘이 나와요 · 지금은 '+SKY.src+' 하늘':(c===3?'📍 위치를 찾는 데 오래 걸려요 (실내?) · 지금은 '+SKY.src+' 하늘 · 📍를 다시 눌러 보세요':'📍 위치를 못 찾았어요 (GPS 꺼짐?) · 지금은 '+SKY.src+' 하늘'),4500)},{enableHighAccuracy:false,timeout:20000,maximumAge:1800000})}
-function chips(){var h='<button class="chip" id="cLoc">📍 '+esc((SKY.src||'').replace(/\(.*\)/,'')||'부산')+'</button>';
+function thumbPos(){try{var b=document.querySelector('.bot').offsetHeight;$('stick').style.bottom=(b+14)+'px';$('tel').style.bottom=(b+52)+'px'}catch(e){}}
+addEventListener('resize',function(){setTimeout(thumbPos,50)});
+function chips(){setTimeout(thumbPos,0);var h='<button class="chip" id="cLoc">📍 '+esc((SKY.src||'').replace(/\(.*\)/,'')||'부산')+'</button>';
  if(MODE==='ar')h+='<button class="chip'+(AR.on?' on':'')+'" id="cAr">📱 폰 방향 '+(AR.on?'켜짐':'꺼짐')+'</button>';
- h+=wxChip();h+='<button class="chip" id="cEcl">🌘 일식·월식</button>';h+='<button class="chip'+(SHOWALL?' on':'')+'" id="cAll">✦ 별자리 선 '+(SHOWALL?'모두':'겨눌 때만')+'</button><button class="chip'+(ECLON?' on':'')+'" id="cEc">☉ 황도</button>';
+ h+=wxChip();if(MODE==='ar')h+='<button class="chip" id="cSn">🎚 감도 '+['느리게','보통','빠르게'][SENS]+'</button>';h+='<button class="chip" id="cEcl">🌘 일식·월식</button>';h+='<button class="chip'+(SHOWALL?' on':'')+'" id="cAll">✦ 별자리 선 '+(SHOWALL?'모두':'겨눌 때만')+'</button><button class="chip'+(ECLON?' on':'')+'" id="cEc">☉ 황도</button>';
  
- $('chips').innerHTML=h;$('cLoc').onclick=locate;if($('cWx'))$('cWx').onclick=wxToggle;$('cEcl').onclick=eclSheet;if($('cAr'))$('cAr').onclick=function(){AR.on?arOff():arOn()};
+ $('chips').innerHTML=h;$('cLoc').onclick=locate;if($('cSn'))$('cSn').onclick=function(){SENS=(SENS+1)%3;try{localStorage.setItem('star_sens',SENS)}catch(e){}AR.anc=null;chips();toast('🎚 폰 감도 '+['느리게 (떨림 많이 잡음)','보통','빠르게 (바로 따라감)'][SENS],1800)};if($('cWx'))$('cWx').onclick=wxToggle;$('cEcl').onclick=eclSheet;if($('cAr'))$('cAr').onclick=function(){AR.on?arOff():arOn()};
  $('cAll').onclick=function(){SHOWALL=!SHOWALL;chips();draw2()};$('cEc').onclick=function(){ECLON=!ECLON;chips();rebuild()};
  if($('cFl'))$('cFl').onclick=function(){skyFlip(SKYPH?0:1);FLIPHOLD=Date.now()+20000;chips()}}
 var FLIPHOLD=0;setInterval(function(){if(MODE!=='ar'||Date.now()<FLIPHOLD)return;skyFlip(SKYPH?0:1)},3500);
@@ -809,7 +835,7 @@ var RB=0;function rebuild(){clearTimeout(RB);RB=setTimeout(function(){if(MODE===
 $('tr').oninput=function(){OFF=+this.value;rebuild()};$('tn').onclick=function(){OFF=0;$('tr').value=0;rebuild()};
 setInterval(function(){if(!OFF){rebuild()}},600000);
 function setMode(m){MODE=m;[].forEach.call(document.querySelectorAll('.seg button'),function(b){b.classList.toggle('on',b.dataset.m===m)});
- $('v3').hidden=m!=='ar';$('tel').hidden=m!=='ar';if(m!=='ar'){telSet(0);$('scope').hidden=true}$('v2').hidden=m!=='map';$('ring').hidden=m!=='ar';$('tgt').hidden=true;$('arw').hidden=true;closeCard();
+ $('v3').hidden=m!=='ar';$('tel').hidden=m!=='ar';$('stick').hidden=m!=='ar';if(m!=='ar'){telSet(0);$('scope').hidden=true}$('v2').hidden=m!=='map';$('ring').hidden=m!=='ar';$('tgt').hidden=true;$('arw').hidden=true;closeCard();
  if(m==='ar'){build3();$('hint').textContent=AR.on?'폰을 하늘로 들어 보세요 · 가운데 원에 별자리를 3초 맞추면 도감에 모여요':'끌어서 둘러보기 · 두 손가락으로 확대 · 가운데 원에 3초 맞추면 도감에 모여요'}else{if(AR.on)arOff();sz2();draw2()}chips()}
 [].forEach.call(document.querySelectorAll('.seg button'),function(b){b.onclick=function(){setMode(b.dataset.m)}});
 $('bDg').onclick=dogam;
@@ -845,8 +871,28 @@ function labDeclutter(){if(!G3||MODE!=='ar')return;var H=innerHeight,W=innerWidt
   if(LDV.z<1){var d=LDW.distanceTo(C.position)||1,hp=s.scale.y/d*f,wp=s.scale.x/d*f,x=(LDV.x+1)/2*W,y=(1-LDV.y)/2*H,r=[x-wp/2+4,y-hp/2+4,x+wp/2-4,y+hp/2-4];
    tgt=1;for(var i=0;i<placed.length;i++){var p=placed[i];if(r[0]<p[2]&&r[2]>p[0]&&r[1]<p[3]&&r[3]>p[1]){tgt=0;break}}if(tgt)placed.push(r)}
   var o=s.userData.op==null?1:s.userData.op;o+=(tgt-o)*.25;s.userData.op=o;s.material.opacity=o;s.material.transparent=true})}
+/* 🕹 왼쪽 스틱 : 밀면 그쪽으로 계속 둘러봄 (멀리 밀수록 빠르게) · 망원경일 땐 아주 천천히 */
+var STK={x:0,y:0,id:null};(function(){var el=$('stick'),kn=el.firstChild;
+ function at(e){var r=el.getBoundingClientRect(),R=r.width/2,dx=e.clientX-(r.left+R),dy=e.clientY-(r.top+R),d=Math.hypot(dx,dy),m=R-14;if(d>m){dx*=m/d;dy*=m/d}STK.x=dx/m;STK.y=dy/m;kn.style.transform='translate('+dx+'px,'+dy+'px)'}
+ el.addEventListener('pointerdown',function(e){STK.id=e.pointerId;el.setPointerCapture(e.pointerId);at(e);e.stopPropagation();e.preventDefault()});
+ el.addEventListener('pointermove',function(e){if(STK.id===e.pointerId)at(e)});
+ function up(e){if(STK.id!==e.pointerId)return;STK.id=null;STK.x=STK.y=0;kn.style.transform=''}el.addEventListener('pointerup',up);el.addEventListener('pointercancel',up)})();
+function stickTick(dt){if(MODE!=='ar'||(!STK.x&&!STK.y))return;var sp=V.fov*D2R*(AR.on?.18:.45)*dt,   // 폰으로 크게 · 스틱은 미세 조정 (화면 폭의 1/5 정도/초)
+ ax=STK.x*Math.abs(STK.x),ay=STK.y*Math.abs(STK.y);
+ if(AR.on&&!AR.hold){AR.dAz+=ax*sp;AR.dAlt=Math.max(-1.4,Math.min(1.4,AR.dAlt-ay*sp));arApply()}else{V.taz+=ax*sp;V.talt=Math.max(-1.2,Math.min(1.5,V.talt-ay*sp))}}
+/* 🌕 달 확대 : 당길수록 NASA 달 정찰위성(LRO) 실제 지도 조각을 받아 그 자리만 고화질로 (100m 급) */
+var MDT={k:'',cv:null,x:null,t:0,ray:new THREE.Raycaster(),want:0};
+function moonDetail(now){var m=TEL.moonM;MDU.dOn.value+=((MDT.want)-MDU.dOn.value)*.08;if(now-MDT.t<350)return;MDT.t=now;MDT.want=0;
+ if(!m||!TEL.on||!m.visible)return;var H=innerHeight,W=Math.PI*H*.52/V.fov,z=Math.ceil(Math.log2(W/512));if(z<3)return;z=Math.min(8,z);
+ MDT.ray.setFromCamera(new THREE.Vector2(0,0),C);var hit=MDT.ray.intersectObject(m,false)[0];if(!hit||!hit.uv)return;
+ var nx=Math.pow(2,z+1),ny=Math.pow(2,z),N=4,cc=Math.floor(hit.uv.x*nx),rr=Math.floor((1-hit.uv.y)*ny),c0=Math.max(0,Math.min(nx-N,cc-1)),r0=Math.max(0,Math.min(ny-N,rr-1)),k=z+'/'+r0+'/'+c0;MDT.want=1;
+ if(k===MDT.k)return;MDT.k=k;var cv=document.createElement('canvas');cv.width=cv.height=256*N;var x=cv.getContext('2d'),tx=new THREE.CanvasTexture(cv),left=N*N,first=true;
+ function show(){if(MDT.k!==k)return;tx.needsUpdate=true;if(first){first=false;MDU.dTex.value=tx;MDU.dB.value.set(c0/nx,1-(r0+N)/ny,(c0+N)/nx,1-r0/ny)}}
+ x.fillStyle='#555';x.fillRect(0,0,cv.width,cv.height);
+ for(var j=0;j<N;j++)for(var i=0;i<N;i++)(function(i,j){var im=new Image();im.crossOrigin='anonymous';im.onload=function(){if(MDT.k!==k)return;x.drawImage(im,i*256,j*256);if(--left<=N*N-4||left===0)show()};im.onerror=function(){--left};
+  im.src='https://trek.nasa.gov/tiles/Moon/EQ/LRO_WAC_Mosaic_Global_303ppd_v02/1.0.0/default/default028mm/'+z+'/'+(r0+j)+'/'+(c0+i)+'.jpg'})(i,j)}
 function loop(now){requestAnimationFrame(loop);var dt=Math.min(.1,(now-last)/1000);last=now;if(MODE!=='ar')return;
- var _q0=G3?G3.quaternion.clone():null;skySpin();if(_q0&&G3&&V.fov<1.5&&(!AR.on||AR.hold)){var dq=G3.quaternion.clone().multiply(_q0.invert());[['az','alt'],['taz','talt']].forEach(function(k){var v=skyPos(V[k[1]],V[k[0]],1).applyQuaternion(dq);V[k[1]]=Math.asin(Math.max(-1,Math.min(1,v.y)));V[k[0]]=Math.atan2(v.x,-v.z)})}telApply();telSeeing(now);dsoTick();tname();tguide();var da=((V.taz-V.az+Math.PI*3)%(Math.PI*2))-Math.PI,k=1-Math.exp(-dt*(AR.on?3:14));V.az+=da*k;V.alt+=(V.talt-V.alt)*k;camUpd();cxTick(dt);try{labDeclutter()}catch(e){}R3.autoClear=true;R3.setScissorTest(false);R3.setViewport(0,0,innerWidth,innerHeight);R3.render(S,C);
+ var _q0=G3?G3.quaternion.clone():null;skySpin();if(_q0&&G3&&V.fov<1.5&&(!AR.on||AR.hold)){var dq=G3.quaternion.clone().multiply(_q0.invert());[['az','alt'],['taz','talt']].forEach(function(k){var v=skyPos(V[k[1]],V[k[0]],1).applyQuaternion(dq);V[k[1]]=Math.asin(Math.max(-1,Math.min(1,v.y)));V[k[0]]=Math.atan2(v.x,-v.z)})}telApply();telSeeing(now);dsoTick();tname();tguide();var da=((V.taz-V.az+Math.PI*3)%(Math.PI*2))-Math.PI,k=1-Math.exp(-dt*(AR.on?(TEL.t>0.02?4:7):14));V.az+=da*k;V.alt+=(V.talt-V.alt)*k;stickTick(dt);camUpd();cxTick(dt);try{labDeclutter()}catch(e){}try{moonDetail(now)}catch(e){}R3.autoClear=true;R3.setScissorTest(false);R3.setViewport(0,0,innerWidth,innerHeight);R3.render(S,C);
  if(TEL.t>0.02)return;
  var cw=Math.min(innerWidth*.42,230),ch=cw*1.25,cx=(innerWidth-cw)/2,cy=innerWidth>=900?92:160;   // 아래 가운데 (조작 줄 위)
  // 캐릭터는 땅 위에 서 있음 : 하늘을 올려다볼수록 화면 아래로 내려가 사라짐 (하늘에 따라다니지 않게)

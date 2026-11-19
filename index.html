@@ -82,12 +82,12 @@ button{font:inherit;color:inherit;border:0;background:none;cursor:pointer;paddin
 #scope .glint{position:absolute;left:50%;top:50%;width:calc(var(--R)*2);height:calc(var(--R)*2);transform:translate(-50%,-50%);border-radius:50%;
  background:radial-gradient(ellipse 40% 22% at 30% 18%,rgba(160,190,255,.07),transparent 70%),radial-gradient(circle at 50% 50%,transparent 70%,rgba(90,120,200,.06) 92%,transparent 100%);box-shadow:inset 0 0 50px rgba(0,0,0,.85)}   /* 렌즈 코팅 빛 반사 · 안쪽 그늘 */
 #tel{position:fixed;right:max(10px,env(safe-area-inset-right,0px));top:50%;transform:translateY(-50%);z-index:11;display:flex;flex-direction:column;align-items:center;gap:8px;touch-action:none}
-#tel>span:first-child{font-size:20px}#tmag{font-size:12px;font-weight:800;color:var(--gold);min-height:16px;text-shadow:0 1px 3px #000}
+#tel>span:first-child{font-size:20px}#tmag{position:absolute;top:calc(100% + 6px);left:50%;transform:translateX(-50%);white-space:nowrap;text-align:center;font-size:12px;font-weight:800;color:var(--gold);line-height:1.25;text-shadow:0 1px 3px #000}
 #ttrack{position:relative;width:34px;height:min(38vh,280px);border-radius:99px;background:rgba(10,14,28,.7);box-shadow:inset 0 0 0 1px var(--line);touch-action:none;cursor:ns-resize}
 #tfill{position:absolute;left:12px;right:12px;bottom:12px;border-radius:99px;background:linear-gradient(var(--gold),#b8862a)}
 #tknob{position:absolute;left:3px;width:28px;height:28px;border-radius:50%;background:#fff6dc;box-shadow:0 2px 8px rgba(0,0,0,.5)}
 #tgB{background:rgba(10,14,28,.7);box-shadow:inset 0 0 0 1px var(--line);border-radius:12px;padding:5px 6px;font-size:15px;line-height:1.1;color:var(--gold)}#tgB small{font-size:9.5px;font-weight:800}#tgB.off{color:#6d7795;text-decoration:line-through}
-#tlock{background:#22304F;color:var(--gold);font:900 11px var(--f);border-radius:12px;padding:6px 8px;line-height:1.3}
+#tlock{position:absolute;top:calc(100% + 26px);left:50%;transform:translateX(-50%);white-space:nowrap;background:#22304F;color:var(--gold);font:900 11px var(--f);border-radius:12px;padding:6px 8px;line-height:1.3}
  #mupop{position:fixed;right:max(12px,env(safe-area-inset-right,0px));top:calc(58px + env(safe-area-inset-top,0px));z-index:20;display:flex;align-items:center;gap:10px;background:var(--panel);border-radius:16px;padding:10px 14px;box-shadow:inset 0 0 0 1px var(--line)}
 #mupop input{width:150px;accent-color:#FFD76A}#mupop button{font-size:20px}#mupop span{font-size:12px;font-weight:800;color:var(--gold);min-width:32px}
 #bMu.on{color:var(--gold);box-shadow:inset 0 0 0 1px rgba(255,215,106,.6)}
@@ -483,6 +483,7 @@ function arOff(){AR.on=0;removeEventListener('deviceorientationabsolute',arEv,tr
 /* ---------- 🔭 망원경 : 왼쪽 세로 막대를 올리면 확대 · 무료는 진짜 망원경만큼(작게) · PRO 는 더 당겨 고화질 ---------- */
 var TEL={t:0,on:false,pro:false,discs:[],moons:[]};
 try{TEL.pro=localStorage.getItem('star_pro')==='1'}catch(e){}
+try{if(window.MkjTTS&&MkjTTS.pro&&MkjTTS.pro())TEL.pro=true}catch(e){}   // 매커조 PRO 면 스타윈도우도 PRO
 var PDIA={'수성':6.74,'금성':16.92,'화성':9.36,'목성':196.94,'토성':165.6,'천왕성':70.48,'해왕성':68.3};   // 1AU 에서 보이는 지름(각초)
 var PTX={};
 function ptex(nm,hi,B){var k=nm+(hi?'H':'L')+(B!=null?Math.round(B*20):'');if(PTX[k])return PTX[k];

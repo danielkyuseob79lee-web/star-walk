@@ -6,3 +6,5 @@
 - 메시에 목록·은하수 윤곽: d3-celestial (BSD)
 - 지형 높이: AWS Terrain Tiles (Mapzen terrarium · 공개 자료)
 - 위성사진(선택): 국토교통부 브이월드 오픈 API
+- 위성 지도(이오·유로파·가니메데·칼리스토·타이탄 등 19개): NASA 3D Resources (공공 저작물)
+- 날씨: Open-Meteo (open-meteo.com) 무료 날씨 API · CC BY 4.0

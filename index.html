@@ -1,13 +1,13 @@
 <!doctype html>
 <html lang="ko"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
-<title>별자리 산책</title>
+<title>스타윈도우 StarWindow</title>
 <meta name="theme-color" content="#05070f">
 <meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Gowun+Dodum&family=Gowun+Batang:wght@700&display=swap">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css">
 <style>
 :root{--bg:#05070f;--ink:#EEF1FF;--sub:#9FB0D8;--gold:#FFD76A;--panel:rgba(10,14,28,.78);--line:rgba(255,255,255,.14);
- --f:"Gowun Dodum","Apple SD Gothic Neo","Malgun Gothic",sans-serif;--fd:"Gowun Batang",serif;color-scheme:dark}
+ --f:"Pretendard","Apple SD Gothic Neo","Malgun Gothic",sans-serif;--fd:"Pretendard","Apple SD Gothic Neo","Malgun Gothic",sans-serif;color-scheme:dark}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 [hidden]{display:none!important}
 html,body{margin:0;height:100%;background:var(--bg);color:var(--ink);font-family:var(--f);overflow:hidden;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
@@ -17,7 +17,7 @@ button{font:inherit;color:inherit;border:0;background:none;cursor:pointer;paddin
 /* 위 막대 */
 .top{position:fixed;left:0;right:0;top:0;z-index:10;display:flex;align-items:center;gap:8px;padding:calc(10px + env(safe-area-inset-top,0px)) max(12px,env(safe-area-inset-right,0px)) 10px max(12px,env(safe-area-inset-left,0px));background:linear-gradient(rgba(5,7,15,.85),rgba(5,7,15,0));pointer-events:none}
 .top>*{pointer-events:auto}
-.top h1{margin:0;font:700 19px var(--fd);letter-spacing:.5px;white-space:nowrap;color:var(--gold)}
+.top h1{margin:0;font:800 19px var(--fd);letter-spacing:.5px;white-space:nowrap;color:var(--gold)}
 .seg{display:flex;background:rgba(255,255,255,.08);border-radius:99px;padding:3px;margin-left:auto;box-shadow:inset 0 0 0 1px var(--line)}
 .seg button{padding:7px 12px;border-radius:99px;font-weight:700;font-size:13.5px;color:var(--sub);white-space:nowrap}
 .seg button.on{background:rgba(255,215,106,.18);color:var(--gold)}
@@ -95,10 +95,10 @@ button{font:inherit;color:inherit;border:0;background:none;cursor:pointer;paddin
 </style></head>
 <body>
 <div id="v3"></div><canvas id="v2" hidden></canvas>
-<div class="top"><h1>✦ 별자리 산책</h1>
+<div class="top"><h1>✦ 스타윈도우</h1>
  <div class="seg"><button data-m="ar" class="on">하늘 비추기</button><button data-m="map">별자리판</button></div>
  <button class="ib" id="bMu" title="음악">♪</button><button class="ib" id="bDg" title="도감">📖</button></div><div id="mupop" hidden><button id="muT">🔊</button><input type="range" id="muV" min="0" max="100" step="1"><span id="muN"></span></div>
-<div id="snd"><div class="sb"><h2>✦ 별자리 산책</h2><p>오늘 밤 내 머리 위 하늘이에요</p><button id="sOn">🔊 소리 켜고 시작</button><button class="w" id="sOff">🔇 소리 없이 시작</button></div></div>
+<div id="snd"><div class="sb"><h2>✦ 스타윈도우</h2><div style="font-size:12px;letter-spacing:3px;color:var(--sub);margin:-4px 0 8px;font-weight:700">STARWINDOW</div><p>오늘 밤 내 머리 위 하늘이에요</p><button id="sOn">🔊 소리 켜고 시작</button><button class="w" id="sOff">🔇 소리 없이 시작</button></div></div>
 <div id="scope" hidden><div class="fs"></div><div class="rim"></div><div class="glint"></div><div class="knurl"></div><div id="tname"></div></div><div id="tel"><button id="tgB" title="길잡이 선">〰<br><small>길잡이</small></button><span>🔭</span><div id="ttrack"><i id="tfill"></i><b id="tknob"></b></div><span id="tmag"></span><button id="tlock" hidden>PRO<br>더 당기기</button></div>
 <canvas id="tguide" style="position:fixed;inset:0;z-index:6;pointer-events:none"></canvas><div id="ring" hidden></div><div id="tgt" hidden></div><div id="arw" hidden><i></i><b></b></div>
 <div class="bot">
@@ -225,10 +225,10 @@ function hgSvgImgs(L,fill,cb){var imgs=[],n=0;L.forEach(function(svg,i){var m=sv
   im.onload=function(){if(++n===L.length)cb(imgs)};im.src='data:image/svg+xml;charset=utf-8,'+encodeURIComponent(svg.replace(/var\(--ink\)/g,fill).replace(/var\(--z1\)/g,'#2E2940').replace(/var\(--z2\)/g,'#1F332C').replace(/var\(--z3\)/g,'#3A2A20'));imgs[i]=im})}
 function hgCanvas(imgs,ko,col){var S2=2,H=84*S2,KH=30*S2,PAD=10*S2,GAP=26*S2,k=H/100,c=document.createElement('canvas'),x=c.getContext('2d'),   // 2배 해상도로 그려 또렷하게 · 모든 글자 같은 배율
   top=Math.min.apply(null,imgs.map(function(im){return im.vby})),ws=imgs.map(function(im){return im.vbw*k}),bot=Math.max.apply(null,imgs.map(function(im){return im.vby-top+im.vbh}))*k,
-  W=ws.reduce(function(a,b){return a+b},0)+GAP*(ws.length-1)+PAD*2;x.font='bold '+(24*S2)+'px sans-serif';W=Math.max(W,x.measureText(ko).width+PAD*2);
+  W=ws.reduce(function(a,b){return a+b},0)+GAP*(ws.length-1)+PAD*2;x.font='bold '+(24*S2)+'px Pretendard,sans-serif';W=Math.max(W,x.measureText(ko).width+PAD*2);
  c.width=Math.ceil(W);c.height=Math.ceil(bot+KH+PAD*2);x=c.getContext('2d');x.fillStyle='rgba(2,3,6,.82)';(function(){var r=14*S2,w=c.width,h=c.height;x.beginPath();x.moveTo(r,0);x.arcTo(w,0,w,h,r);x.arcTo(w,h,0,h,r);x.arcTo(0,h,0,0,r);x.arcTo(0,0,w,0,r);x.closePath();x.fill()})();var tw=ws.reduce(function(a,b){return a+b},0)+GAP*(ws.length-1),px=(c.width-tw)/2;
  imgs.forEach(function(im,i){x.drawImage(im,px,PAD+(im.vby-top)*k,ws[i],im.vbh*k);px+=ws[i]+GAP});
- x.font='bold '+(24*S2)+'px sans-serif';x.textAlign='center';x.textBaseline='middle';x.lineWidth=6*S2;x.strokeStyle='rgba(8,12,30,.85)';x.strokeText(ko,c.width/2,PAD+bot+KH/2+2*S2);
+ x.font='bold '+(24*S2)+'px Pretendard,sans-serif';x.textAlign='center';x.textBaseline='middle';x.lineWidth=6*S2;x.strokeStyle='rgba(8,12,30,.85)';x.strokeText(ko,c.width/2,PAD+bot+KH/2+2*S2);
  x.fillStyle=new THREE.Color(col).getStyle();x.fillText(ko,c.width/2,PAD+bot+KH/2+2*S2);
  var t=new THREE.CanvasTexture(c);t.anisotropy=4;t.userData={r:c.width/c.height,h:c.height/(H+KH+PAD*2)};return t}
 var CXHG=0;   // 0 안 받음 · 1 받는 중 · 2 받음
@@ -253,8 +253,8 @@ function skyTap(cx,cy){if(!SKY.g||!SKY.g.visible||!SKY.g.userData.cons||!SKY.g.u
  if(best&&bd<90){hgSay(best.userData.say);skyFlip.hold=Date.now()+3500;skyFlip(1);return true}return false}
 
 function skyLabel(txt,col){var c=document.createElement('canvas'),x=c.getContext('2d');
- x.font='bold 40px sans-serif';c.width=Math.ceil(x.measureText(txt).width)+24;c.height=56;
- x=c.getContext('2d');x.font='bold 40px sans-serif';x.textBaseline='middle';
+ x.font='bold 40px Pretendard,sans-serif';c.width=Math.ceil(x.measureText(txt).width)+24;c.height=56;
+ x=c.getContext('2d');x.font='bold 40px Pretendard,sans-serif';x.textBaseline='middle';
  x.fillStyle='rgba(0,0,0,.45)';x.fillRect(0,0,c.width,c.height);
  x.fillStyle=col;x.fillText(txt,12,30);
  var sp=new THREE.Sprite(new THREE.SpriteMaterial({map:new THREE.CanvasTexture(c),depthTest:false,transparent:true,fog:false}));
@@ -579,7 +579,7 @@ function tguide(){var cv=$('tguide');if(!TGc){TGc=cv.getContext('2d')}var w=inne
  var R0=Math.min(w*.44,h*.40),cx=w/2,cy=h/2,f=new THREE.Vector3(0,0,-1).applyQuaternion(C.quaternion),half=V.fov/2*D2R*Math.min(1,w/h),list=[];
  TEL.discs.concat(TEL.moons,TEL.moonM?[TEL.moonM]:[]).forEach(function(o){var nm=o.userData.nm||o.userData.nm2;if(!nm)return;o.getWorldPosition(TGV);list.push({n:(o.userData.nm2?'🛰 ':'')+nm,p:TGV.clone(),r:o.geometry&&o.geometry.parameters&&o.geometry.parameters.radius||0})});
  if(FIND){var aa=skyAA(FIND.ra,FIND.dec,skyLST(T(),SKY.lon),SKY.lat);list.push({n:FIND.n,p:skyPos(aa[0],aa[1],RS),r:0,go:1})}
- x.font='600 12px "Gowun Dodum",sans-serif';x.textAlign='center';x.lineWidth=1;var out=null,ob=1e9,used=[];list.sort(function(a,b){return (a.n.indexOf('🛰')>=0)-(b.n.indexOf('🛰')>=0)});
+ x.font='600 12px Pretendard,sans-serif';x.textAlign='center';x.lineWidth=1;var out=null,ob=1e9,used=[];list.sort(function(a,b){return (a.n.indexOf('🛰')>=0)-(b.n.indexOf('🛰')>=0)});
  list.forEach(function(it){var a=f.angleTo(it.p.clone().normalize()),pr=it.p.clone().project(C),sx=(pr.x+1)/2*w,sy=(1-pr.y)/2*h,inV=pr.z<1&&Math.hypot(sx-cx,sy-cy)<R0;
   if(inV){var pxr=it.r?it.r/(it.p.length()*Math.tan(V.fov*D2R/2))*h/2:0;if(pxr<14){x.strokeStyle='rgba(255,215,106,.7)';x.beginPath();x.arc(sx,sy,Math.max(7,pxr+6),0,7);x.stroke();var ly=sy-Math.max(10,pxr+10);if(!used.some(function(u){return Math.abs(u[0]-sx)<70&&Math.abs(u[1]-ly)<15})){used.push([sx,ly]);x.fillStyle='rgba(255,226,150,.95)';x.fillText(it.n,sx,ly)}}}
   else if(a<(it.go?Math.PI:60*D2R)&&(it.go||a<ob)){if(it.go||!out||!out.go){ob=a;out={it:it,sx:sx,sy:sy,bh:pr.z>1,a:a}}}});
@@ -736,17 +736,17 @@ function draw2(){if(MODE!=='map')return;var x=X2,w=innerWidth,h=innerHeight,o=ge
   if(on&&n){var ca=skyAA(c.c[0],c.c[1],L,lat);if(ca[0]<0.02)return;var cp=prj(ca[0],ca[1],o);M2.hits.push([cp[0],cp[1],c]);labs.push([cp,c,sel])}});
  labs.forEach(function(q){var cp=q[0],c=q[1],sel=q[2];var im=(sel||got[c.id]||M2.z>=1.6)?lab2(c.ko,'#ffe8a8',c.ko):null;
   if(im&&(sel||M2.z>=1.6||got[c.id])){var s=(sel?.42:.3)*Math.min(1.4,M2.z*.8),iw=im.width*s/2,ih=im.height*s/2;x.globalAlpha=sel?1:.92;x.drawImage(im,cp[0]-iw/2,cp[1]-ih/2,iw,ih);x.globalAlpha=1}
-  else{x.font='600 '+(11*Math.min(1.3,M2.z))+'px "Gowun Dodum",sans-serif';x.textAlign='center';x.fillStyle=got[c.id]?'rgba(255,224,150,.9)':'rgba(200,210,240,.62)';x.fillText(c.ko.replace(/자리$/,''),cp[0],cp[1])}});
+  else{x.font='600 '+(11*Math.min(1.3,M2.z))+'px Pretendard,sans-serif';x.textAlign='center';x.fillStyle=got[c.id]?'rgba(255,224,150,.9)':'rgba(200,210,240,.62)';x.fillText(c.ko.replace(/자리$/,''),cp[0],cp[1])}});
  // 행성 · 달
  var dd=pday(now);for(var pn in PLEL){var pp=pxy(pn,dd);if(pp.mag>6.2)continue;var a3=skyAA(pp.ra,pp.dec,L,lat);if(a3[0]<0)continue;var p3=prj(a3[0],a3[1],o);
-  x.fillStyle=pp.col;x.shadowColor=pp.col;x.shadowBlur=10;x.beginPath();x.arc(p3[0],p3[1],4.2,0,7);x.fill();x.shadowBlur=0;x.font='700 12px "Gowun Dodum",sans-serif';x.fillStyle=pp.col;x.textAlign='left';x.fillText(pn,p3[0]+7,p3[1]-6)}
- try{var sa2=sunAA(now);DAY=sa2[0]>-6*D2R;if(sa2[0]>0){var ps=prj(sa2[0],sa2[1],o);var sg=x.createRadialGradient(ps[0],ps[1],0,ps[0],ps[1],26);sg.addColorStop(0,'#fff3c4');sg.addColorStop(.35,'#ffcf6a');sg.addColorStop(1,'rgba(255,207,106,0)');x.fillStyle=sg;x.beginPath();x.arc(ps[0],ps[1],26,0,7);x.fill();x.font='700 12px "Gowun Dodum",sans-serif';x.fillStyle='#ffd27a';x.textAlign='center';x.fillText('☀️ 해',ps[0],ps[1]+36)}}catch(e){}
- try{var ma=moonAA(now);if(ma[0]>0){var pm=prj(ma[0],ma[1],o);drawMoon(moonAgeAt(now));x.drawImage(MCV,pm[0]-22,pm[1]-22,44,44);x.font='700 12px "Gowun Dodum",sans-serif';x.fillStyle='#fff3c4';x.textAlign='center';x.fillText('🌙 '+moonName(moonAgeAt(now))[1],pm[0],pm[1]+30)}}catch(e){}
+  x.fillStyle=pp.col;x.shadowColor=pp.col;x.shadowBlur=10;x.beginPath();x.arc(p3[0],p3[1],4.2,0,7);x.fill();x.shadowBlur=0;x.font='700 12px Pretendard,sans-serif';x.fillStyle=pp.col;x.textAlign='left';x.fillText(pn,p3[0]+7,p3[1]-6)}
+ try{var sa2=sunAA(now);DAY=sa2[0]>-6*D2R;if(sa2[0]>0){var ps=prj(sa2[0],sa2[1],o);var sg=x.createRadialGradient(ps[0],ps[1],0,ps[0],ps[1],26);sg.addColorStop(0,'#fff3c4');sg.addColorStop(.35,'#ffcf6a');sg.addColorStop(1,'rgba(255,207,106,0)');x.fillStyle=sg;x.beginPath();x.arc(ps[0],ps[1],26,0,7);x.fill();x.font='700 12px Pretendard,sans-serif';x.fillStyle='#ffd27a';x.textAlign='center';x.fillText('☀️ 해',ps[0],ps[1]+36)}}catch(e){}
+ try{var ma=moonAA(now);if(ma[0]>0){var pm=prj(ma[0],ma[1],o);drawMoon(moonAgeAt(now));x.drawImage(MCV,pm[0]-22,pm[1]-22,44,44);x.font='700 12px Pretendard,sans-serif';x.fillStyle='#fff3c4';x.textAlign='center';x.fillText('🌙 '+moonName(moonAgeAt(now))[1],pm[0],pm[1]+30)}}catch(e){}
  x.restore();
  // 테두리 · 방위
  x.strokeStyle='rgba(255,215,106,.55)';x.lineWidth=2;x.beginPath();x.arc(o.cx,o.cy,o.R,0,7);x.stroke();
  [['북',0],['동',90],['남',180],['서',270]].forEach(function(d){var p=prj(0,d[1]*D2R,o),dx=p[0]-o.cx,dy=p[1]-o.cy,k=(o.R+30)/o.R;var im=lab2(d[0],'#ffffff',d[0]);
-  if(im){var s=.42,iw=im.width*s/2,ih=im.height*s/2;x.drawImage(im,o.cx+dx*k-iw/2,o.cy+dy*k-ih/2,iw,ih)}else{x.font='800 15px "Gowun Dodum",sans-serif';x.fillStyle='#fff';x.textAlign='center';x.textBaseline='middle';x.fillText(d[0],o.cx+dx*k,o.cy+dy*k);x.textBaseline='alphabetic'}});
+  if(im){var s=.42,iw=im.width*s/2,ih=im.height*s/2;x.drawImage(im,o.cx+dx*k-iw/2,o.cy+dy*k-ih/2,iw,ih)}else{x.font='800 15px Pretendard,sans-serif';x.fillStyle='#fff';x.textAlign='center';x.textBaseline='middle';x.fillText(d[0],o.cx+dx*k,o.cy+dy*k);x.textBaseline='alphabetic'}});
  var fd=((Math.PI-M2.rot)%(2*Math.PI)+2*Math.PI)%(2*Math.PI);$('hint').textContent='아래쪽이 '+['북','북동','동','남동','남','남서','서','북서'][Math.round(fd/(Math.PI/4))%8]+' 하늘 · 그쪽을 보고 머리 위로 들어 맞춰요 · 끌어서 돌리기 · 별자리를 눌러 이름 듣기'}
 function hit2(x,y){var b=null,bd=1e9;(M2.hits||[]).forEach(function(q){var d=Math.hypot(q[0]-x,q[1]-y);if(d<bd){bd=d;b=q[2]}});return bd<46?b:null}
 
@@ -903,6 +903,7 @@ setTimeout(function(){try{terrain()}catch(e){}try{satGround()}catch(e){}},600);
 tlab();sz2();build3();chips();requestAnimationFrame(loop);
 (function(){var q=new URLSearchParams(location.search),lk=q.get('look');if(q.get('off')){OFF=+q.get('off');build3()}if(!lk)return;var now=T(),L=skyLST(now,SKY.lon),aa;
  if(lk==='rd')aa=skyAA(+q.get('ra'),+q.get('dec'),L,SKY.lat);else if(lk==='해')aa=sunAA(now);else if(lk==='달')aa=moonAA(now);else{var pp=pxy(lk,pday(now));aa=skyAA(pp.ra,pp.dec,L,SKY.lat)}V.az=V.taz=aa[1];V.alt=V.talt=aa[0];if(q.get('tel'))telSet(+q.get('tel'))})();
+try{document.fonts.ready.then(function(){setTimeout(rebuild,50)})}catch(e){}
 if(/[?&]map/.test(location.search)){$('snd').remove();setMode('map')}else if(/[?&]sky/.test(location.search)){$('snd').remove();setMode('ar')}else autoStart();
 })();
 </script></body></html>

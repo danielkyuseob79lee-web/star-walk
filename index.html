@@ -867,10 +867,11 @@ function labDeclutter(){if(!G3||MODE!=='ar')return;var H=innerHeight,W=innerWidt
  // 달·해 몸통 자리는 비워 둠
  LBLS.forEach(function(s){var u=s.userData;if(!u.anc||u.pri<3)return;LDW.copy(u.anc).applyMatrix4(G3.matrixWorld);LDV.copy(LDW).project(C);if(LDV.z>1)return;var x=(LDV.x+1)/2*W,y=(1-LDV.y)/2*H,r=18;placed.push([x-r,y-r,x+r,y+r])});
  L.sort(function(a,b){return (b.userData.pri||(b.userData.cx?1.5:1))-(a.userData.pri||(a.userData.cx?1.5:1))});
+ var inScope=TEL.t>0.02;   // 망원경 안에서는 하늘 이름표를 숨김 (이름은 접안렌즈 위에 따로 나옴) · 이름표가 커져서 달을 가리던 것
  L.forEach(function(s){if(!s.visible){s.userData.op=0;return}s.getWorldPosition(LDW);LDV.copy(LDW).project(C);var tgt=0;
-  if(LDV.z<1){var d=LDW.distanceTo(C.position)||1,hp=s.scale.y/d*f,wp=s.scale.x/d*f,x=(LDV.x+1)/2*W,y=(1-LDV.y)/2*H,r=[x-wp/2+4,y-hp/2+4,x+wp/2-4,y+hp/2-4];
+  if(LDV.z<1&&!inScope){var d=LDW.distanceTo(C.position)||1,hp=s.scale.y/d*f,wp=s.scale.x/d*f,x=(LDV.x+1)/2*W,y=(1-LDV.y)/2*H,r=[x-wp/2+4,y-hp/2+4,x+wp/2-4,y+hp/2-4];
    tgt=1;for(var i=0;i<placed.length;i++){var p=placed[i];if(r[0]<p[2]&&r[2]>p[0]&&r[1]<p[3]&&r[3]>p[1]){tgt=0;break}}if(tgt)placed.push(r)}
-  var o=s.userData.op==null?1:s.userData.op;o+=(tgt-o)*.25;s.userData.op=o;s.material.opacity=o;s.material.transparent=true})}
+  var o=s.userData.op==null?1:s.userData.op;o+=(tgt-o)*(inScope?.5:.25);s.userData.op=o;s.material.opacity=o;s.material.transparent=true})}
 /* 🕹 왼쪽 스틱 : 밀면 그쪽으로 계속 둘러봄 (멀리 밀수록 빠르게) · 망원경일 땐 아주 천천히 */
 var STK={x:0,y:0,id:null};(function(){var el=$('stick'),kn=el.firstChild;
  function at(e){var r=el.getBoundingClientRect(),R=r.width/2,dx=e.clientX-(r.left+R),dy=e.clientY-(r.top+R),d=Math.hypot(dx,dy),m=R-14;if(d>m){dx*=m/d;dy*=m/d}STK.x=dx/m;STK.y=dy/m;kn.style.transform='translate('+dx+'px,'+dy+'px)'}

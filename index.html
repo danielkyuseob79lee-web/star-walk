@@ -383,7 +383,7 @@ function ground(){var g=new THREE.SphereGeometry(RS*.97,48,16,0,Math.PI*2,Math.P
   m=new THREE.Mesh(g,new THREE.MeshBasicMaterial({color:'#060a08',transparent:true,opacity:.86,side:THREE.BackSide,depthTest:false,depthWrite:false,fog:false}));m.renderOrder=-30;return m}
 function horizon(){var p=[];for(var i=0;i<=128;i++){var a=i/128*Math.PI*2;p.push(Math.sin(a)*RS*.96,0,-Math.cos(a)*RS*.96)}var g=new THREE.BufferGeometry();g.setAttribute('position',new THREE.Float32BufferAttribute(p,3));
  var l=new THREE.Line(g,new THREE.LineBasicMaterial({color:'#4a6a5a',transparent:true,opacity:.7,depthTest:false}));l.renderOrder=-29;return l}
-function lab3(key,col,ko,k){var l=skyLabelHg(key,col,ko);if(l){l.userData.k=k||1;l.scale.multiplyScalar(k||1)}else{l=skyLabel(ko,col);l.scale.multiplyScalar((k||1)*.9)}l.renderOrder=10;l.material.depthTest=false;return l}
+var LBLS=[];function lab3(key,col,ko,k){var l=skyLabelHg(key,col,ko);LBLS.push(l||null);if(l){l.userData.k=k||1;l.scale.multiplyScalar(k||1)}else{l=skyLabel(ko,col);l.scale.multiplyScalar((k||1)*.9)}l.renderOrder=10;l.material.depthTest=false;LBLS[LBLS.length-1]=l;return l}
 var CXL={};   // id → {c, ln, lb, an(Vector3), pts[], alt}
 function build3(){
  if(G3){S.remove(G3);G3.traverse(function(o){if(o.geometry)o.geometry.dispose()})}SKYL=[];
@@ -417,11 +417,11 @@ function build3(){
  var dd=pday(now);
  for(var pn in PLEL){var pp=pxy(pn,dd),aa=skyAA(pp.ra,pp.dec,L,lat);if(pp.mag>6.2)continue;var q=skyPos(aa[0],aa[1],RS*.985),sz2=pn==='금성'?30:pn==='목성'?26:pn==='화성'||pn==='토성'?23:17;
   var sp=new THREE.Sprite(new THREE.SpriteMaterial({map:starTex(),color:pp.col,depthTest:false,transparent:true,blending:THREE.AdditiveBlending}));sp.position.copy(q);sp.scale.set(sz2,sz2,1);sp.renderOrder=5;G.add(sp);
-  if(aa[0]>-0.02){var pl=lab3(pn,pp.col,'🪐 '+pn,.75);pl.position.set(q.x,q.y+70,q.z);G.add(pl)}}
+  if(aa[0]>-0.02){var pl=lab3(pn,pp.col,'🪐 '+pn,.75);pl.position.set(q.x,q.y+70,q.z);pl.userData.anc=q.clone();pl.userData.dir=1;pl.userData.pri=2;G.add(pl)}}
  // 달
- try{var ma=moonAA(now),mq=skyPos(ma[0],ma[1],RS*.98);if(ma[0]>-0.02){var ml=lab3('달','#fff3c4','🌙 달 · '+moonName(moonAgeAt(now))[1],.85);ml.position.set(mq.x,mq.y-60,mq.z);G.add(ml)}}catch(e){console.warn(e)}
+ try{var ma=moonAA(now),mq=skyPos(ma[0],ma[1],RS*.98);if(ma[0]>-0.02){var ml=lab3('달','#fff3c4','🌙 달 · '+moonName(moonAgeAt(now))[1],.85);ml.position.set(mq.x,mq.y-60,mq.z);ml.userData.anc=mq.clone();ml.userData.dir=-1;ml.userData.pri=3;G.add(ml)}}catch(e){console.warn(e)}
  // 해
- try{var sa=sunAA(now),sq=skyPos(sa[0],sa[1],RS*.97),ss=new THREE.Sprite(new THREE.SpriteMaterial({map:starTex(),color:'#ffcf6a',depthTest:false,transparent:true,blending:THREE.AdditiveBlending}));ss.position.copy(sq);ss.scale.set(120,120,1);SUNG=ss;ss.renderOrder=6;G.add(ss);if(sa[0]>-0.02){var sl=lab3('해','#ffd27a','☀️ 해',.8);sl.position.set(sq.x,sq.y-110,sq.z);G.add(sl)}DAY=sa[0]>-6*D2R}catch(e){}
+ try{var sa=sunAA(now),sq=skyPos(sa[0],sa[1],RS*.97),ss=new THREE.Sprite(new THREE.SpriteMaterial({map:starTex(),color:'#ffcf6a',depthTest:false,transparent:true,blending:THREE.AdditiveBlending}));ss.position.copy(sq);ss.scale.set(120,120,1);SUNG=ss;ss.renderOrder=6;G.add(ss);if(sa[0]>-0.02){var sl=lab3('해','#ffd27a','☀️ 해',.8);sl.position.set(sq.x,sq.y-110,sq.z);sl.userData.anc=sq.clone();sl.userData.dir=-1;sl.userData.pri=3;G.add(sl)}DAY=sa[0]>-6*D2R}catch(e){}
  // 황도
  if(ECLON)try{var eb=eclipBand(L,lat,RS*1.005);eb.traverse(function(o){if(o.material){o.material.depthTest=false;o.renderOrder=-40}});G.add(eb)}catch(e){}
  try{telBuild(G,now,L,lat)}catch(e){console.warn('tel',e)}try{dsoBuild(G,L,lat)}catch(e){}TEL.on=null;
@@ -833,8 +833,20 @@ function telSet(v){TEL.t=Math.max(0,Math.min(1,v));var h=$('ttrack').clientHeigh
 if(/[?&]pro=1/.test(location.search)){TEL.pro=true;try{localStorage.setItem('star_pro','1')}catch(e){}}
 /* 그리기 고리 */
 var last=performance.now();
+/* 이름표 겹침 막기 : 달·해·행성 이름표는 몸통을 가리지 않게 위/아래로 비켜 두고, 서로 겹치면 덜 중요한 것을 잠깐 숨김 */
+var LDV=new THREE.Vector3(),LDW=new THREE.Vector3();
+function labDeclutter(){if(!G3||MODE!=='ar')return;var H=innerHeight,W=innerWidth,f=H/2/Math.tan(C.fov*D2R/2),placed=[],L=[];
+ LBLS=LBLS.filter(function(s){return s&&s.parent});SKYL.forEach(function(s){if(LBLS.indexOf(s)<0&&s.parent)L.push(s)});L=L.concat(LBLS);
+ L.forEach(function(s){var u=s.userData;if(u.anc){var gap=s.scale.y/2+22;s.position.set(u.anc.x,u.anc.y+u.dir*gap,u.anc.z)}});
+ // 달·해 몸통 자리는 비워 둠
+ LBLS.forEach(function(s){var u=s.userData;if(!u.anc||u.pri<3)return;LDW.copy(u.anc).applyMatrix4(G3.matrixWorld);LDV.copy(LDW).project(C);if(LDV.z>1)return;var x=(LDV.x+1)/2*W,y=(1-LDV.y)/2*H,r=18;placed.push([x-r,y-r,x+r,y+r])});
+ L.sort(function(a,b){return (b.userData.pri||(b.userData.cx?1.5:1))-(a.userData.pri||(a.userData.cx?1.5:1))});
+ L.forEach(function(s){if(!s.visible){s.userData.op=0;return}s.getWorldPosition(LDW);LDV.copy(LDW).project(C);var tgt=0;
+  if(LDV.z<1){var d=LDW.distanceTo(C.position)||1,hp=s.scale.y/d*f,wp=s.scale.x/d*f,x=(LDV.x+1)/2*W,y=(1-LDV.y)/2*H,r=[x-wp/2+4,y-hp/2+4,x+wp/2-4,y+hp/2-4];
+   tgt=1;for(var i=0;i<placed.length;i++){var p=placed[i];if(r[0]<p[2]&&r[2]>p[0]&&r[1]<p[3]&&r[3]>p[1]){tgt=0;break}}if(tgt)placed.push(r)}
+  var o=s.userData.op==null?1:s.userData.op;o+=(tgt-o)*.25;s.userData.op=o;s.material.opacity=o;s.material.transparent=true})}
 function loop(now){requestAnimationFrame(loop);var dt=Math.min(.1,(now-last)/1000);last=now;if(MODE!=='ar')return;
- var _q0=G3?G3.quaternion.clone():null;skySpin();if(_q0&&G3&&V.fov<1.5&&(!AR.on||AR.hold)){var dq=G3.quaternion.clone().multiply(_q0.invert());[['az','alt'],['taz','talt']].forEach(function(k){var v=skyPos(V[k[1]],V[k[0]],1).applyQuaternion(dq);V[k[1]]=Math.asin(Math.max(-1,Math.min(1,v.y)));V[k[0]]=Math.atan2(v.x,-v.z)})}telApply();telSeeing(now);dsoTick();tname();tguide();var da=((V.taz-V.az+Math.PI*3)%(Math.PI*2))-Math.PI,k=1-Math.exp(-dt*(AR.on?3:14));V.az+=da*k;V.alt+=(V.talt-V.alt)*k;camUpd();cxTick(dt);R3.autoClear=true;R3.setScissorTest(false);R3.setViewport(0,0,innerWidth,innerHeight);R3.render(S,C);
+ var _q0=G3?G3.quaternion.clone():null;skySpin();if(_q0&&G3&&V.fov<1.5&&(!AR.on||AR.hold)){var dq=G3.quaternion.clone().multiply(_q0.invert());[['az','alt'],['taz','talt']].forEach(function(k){var v=skyPos(V[k[1]],V[k[0]],1).applyQuaternion(dq);V[k[1]]=Math.asin(Math.max(-1,Math.min(1,v.y)));V[k[0]]=Math.atan2(v.x,-v.z)})}telApply();telSeeing(now);dsoTick();tname();tguide();var da=((V.taz-V.az+Math.PI*3)%(Math.PI*2))-Math.PI,k=1-Math.exp(-dt*(AR.on?3:14));V.az+=da*k;V.alt+=(V.talt-V.alt)*k;camUpd();cxTick(dt);try{labDeclutter()}catch(e){}R3.autoClear=true;R3.setScissorTest(false);R3.setViewport(0,0,innerWidth,innerHeight);R3.render(S,C);
  if(TEL.t>0.02)return;
  var cw=Math.min(innerWidth*.42,230),ch=cw*1.25,cx=(innerWidth-cw)/2,cy=innerWidth>=900?92:160;   // 아래 가운데 (조작 줄 위)
  // 캐릭터는 땅 위에 서 있음 : 하늘을 올려다볼수록 화면 아래로 내려가 사라짐 (하늘에 따라다니지 않게)

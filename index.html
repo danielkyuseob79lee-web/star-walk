@@ -247,8 +247,8 @@ function skyLabelHg(key,col,ko){var L=HGN[key];if(!L)return null;
  var sp=new THREE.Sprite(new THREE.SpriteMaterial({map:new THREE.CanvasTexture(document.createElement('canvas')),depthTest:false,transparent:true,fog:false}));
  var fill=new THREE.Color(col).lerp(new THREE.Color('#ffffff'),.6).getStyle();sp.userData.say=HGW[key]||'';sp.userData.lbl=1;
  function fit(t){var kk=sp.userData.k||1,hh=t.userData.h*92*kk;sp.scale.set(t.userData.r*hh,hh,1)}
- hgSvgImgs(L,fill,function(im){sp.userData.tH=hgCanvas(im,ko,col);if(!SKYPH||!sp.userData.tE){sp.material.map=sp.userData.tH;sp.material.needsUpdate=true;fit(sp.userData.tH)}});
- if(HGE[key])hgSvgImgs(HGE[key],fill,function(im){sp.userData.tE=hgCanvas(im,ko,col);if(SKYPH){sp.material.map=sp.userData.tE;sp.material.needsUpdate=true;fit(sp.userData.tE)}});
+ hgSvgImgs(L,fill,function(im){sp.userData.tH=hgCanvas(im,HGW[key]||ko,col);if(!SKYPH||!sp.userData.tE){sp.material.map=sp.userData.tH;sp.material.needsUpdate=true;fit(sp.userData.tH)}});
+ if(HGE[key])hgSvgImgs(HGE[key],fill,function(im){sp.userData.tE=hgCanvas(im,HGW[key]||ko,col);if(SKYPH){sp.material.map=sp.userData.tE;sp.material.needsUpdate=true;fit(sp.userData.tE)}});
  sp.userData.fit=fit;SKYL.push(sp);sp.scale.set(200,92,1);return sp}
 
 function skyFlip(ph,only){SKYPH=ph;SKYL=SKYL.filter(function(s){return !!s.parent});SKYL.forEach(function(s){if(only&&s!==only)return;var t=ph&&s.userData.tE?s.userData.tE:s.userData.tH;if(t&&s.material.map!==t){s.material.map=t;s.material.needsUpdate=true;s.userData.fit(t)}})}
@@ -769,7 +769,7 @@ function sz2(){CV.width=innerWidth*DPR;CV.height=innerHeight*DPR;CV.style.width=
 function prj(alt,az,o){var r=o.R*Math.tan((Math.PI/2-alt)/2),ph=az-Math.PI+M2.rot;return [o.cx+r*Math.sin(ph)*-1*-1*(1),o.cy+r*Math.cos(ph),r]}
 function geo(){var top=70,bot=innerWidth>=900?110:170,R=Math.min(innerWidth*.47,(innerHeight-top-bot)*.5)*M2.z;M2.cy=top+(innerHeight-top-bot)/2;return {cx:innerWidth/2+M2.px,cy:M2.cy+M2.py,R:R}}
 function lab2(key,col,ko){var k=key+'|'+col;if(M2.lab[k]!==undefined)return M2.lab[k];M2.lab[k]=null;var L=HGN[key];if(!L)return null;
- var fill=new THREE.Color(col).lerp(new THREE.Color('#ffffff'),.6).getStyle();hgSvgImgs(L,fill,function(im){M2.lab[k]=hgCanvas(im,ko,col).image;draw2()});return null}
+ var fill=new THREE.Color(col).lerp(new THREE.Color('#ffffff'),.6).getStyle();hgSvgImgs(L,fill,function(im){M2.lab[k]=hgCanvas(im,HGW[k]||ko,col).image;draw2()});return null}
 function draw2(){if(MODE!=='map')return;var x=X2,w=innerWidth,h=innerHeight,o=geo(),now=T(),L=skyLST(now,SKY.lon),lat=SKY.lat;
  x.setTransform(DPR,0,0,DPR,0,0);x.clearRect(0,0,w,h);
  var bg=x.createRadialGradient(o.cx,o.cy,0,o.cx,o.cy,o.R*1.05);bg.addColorStop(0,'#16224a');bg.addColorStop(.75,'#0b1230');bg.addColorStop(1,'#070b1c');
@@ -874,10 +874,12 @@ var last=performance.now();
 var LDV=new THREE.Vector3(),LDW=new THREE.Vector3();
 var LFW=new THREE.Vector3();
 function labDeclutter(){if(!G3||MODE!=='ar')return;var H=innerHeight,W=innerWidth,f=H/2/Math.tan(C.fov*D2R/2),placed=[],L=[];LFW.set(0,0,-1).applyQuaternion(C.quaternion);
- LBLS=LBLS.filter(function(s){return s&&s.parent===G3});SKYL.forEach(function(s){if(LBLS.indexOf(s)<0&&s.parent===G3)L.push(s)});   // 다시 그린 뒤 남은 옛 이름표는 빼기L=L.concat(LBLS);var _mt=[];L=L.filter(function(x){if(_mt.indexOf(x.material)>=0)return false;_mt.push(x.material);return true});   // 같은 재질을 쓰는 이름표는 하나만 (투명도가 서로 덮어써서 다 사라지던 것)
+ LBLS=LBLS.filter(function(s){return s&&s.parent===G3});SKYL.forEach(function(s){if(LBLS.indexOf(s)<0&&s.parent===G3)L.push(s)});   // 다시 그린 뒤 남은 옛 이름표는 빼기
+ L=L.concat(LBLS);var _mt=[];L=L.filter(function(x){if(_mt.indexOf(x.material)>=0)return false;_mt.push(x.material);return true});   // 같은 재질을 쓰는 이름표는 하나만 (투명도가 서로 덮어써서 다 사라지던 것)
  // 이름표 크기 : 확대해도 화면에서 일정 크기 이상 안 커짐
  L.forEach(function(s){var u=s.userData;if(u.ls==null||Math.abs(s.scale.y-u.ls)>1e-6){u.bx=s.scale.x;u.by=s.scale.y}var d=RS*.98,hp=u.by/d*f,mx=u.pri>=2?66:56,k=Math.min(1,mx/Math.max(1,hp));s.scale.set(u.bx*k,u.by*k,1);u.ls=s.scale.y});
- L.forEach(function(s){var u=s.userData;if(u.anc){var gap=s.scale.y/2+(u.pri>=3?40:30)*RS*.98/f;s.position.set(u.anc.x,u.anc.y+u.dir*gap,u.anc.z)}});
+ var CUP=new THREE.Vector3(0,1,0).applyQuaternion(C.quaternion).applyQuaternion(G3.quaternion.clone().invert());   // 화면 위쪽 방향 (하늘 그룹 좌표로)
+ L.forEach(function(s){var u=s.userData;if(u.anc){var gap=s.scale.y/2+(u.pri>=3?40:30)*RS*.98/f;s.position.copy(u.anc).addScaledVector(CUP,u.dir*gap)}});
  // 달·해 몸통 자리는 비워 둠
  LBLS.forEach(function(s){var u=s.userData;if(!u.anc||u.pri<2)return;LDW.copy(u.anc).applyMatrix4(G3.matrixWorld);if(LDW.dot(LFW)<=0)return;LDV.copy(LDW).project(C);if(Math.abs(LDV.x)>1.3||Math.abs(LDV.y)>1.3)return;var x=(LDV.x+1)/2*W,y=(1-LDV.y)/2*H,r=u.pri>=3?28:20;placed.push([x-r,y-r,x+r,y+r])});
  L.sort(function(a,b){return (b.userData.pri||(b.userData.cx?1.5:1))-(a.userData.pri||(a.userData.cx?1.5:1))});
@@ -898,30 +900,39 @@ function stickTick(dt){if(MODE!=='ar'||(!STK.x&&!STK.y))return;var sp=V.fov*D2R*
 /* 🌕 달 확대 : 당길수록 NASA 달 정찰위성(LRO) 실제 지도 조각을 받아 그 자리만 고화질로 (100m 급) */
 var MDT={k:'',cv:null,x:null,t:0,ray:new THREE.Raycaster(),want:0};
 function moonDetail(now){var m=TEL.moonM;MDU.dOn.value+=((MDT.want)-MDU.dOn.value)*.08;if(now-MDT.t<350)return;MDT.t=now;MDT.want=0;
- if(!m||!TEL.on||!m.visible)return;var H=innerHeight,W=Math.PI*H*.52/V.fov,z=Math.ceil(Math.log2(W/512));if(z<3)return;z=Math.min(10,z);
+ if(!m||!TEL.on||!m.visible)return;var H=innerHeight,W=Math.PI*H*.52/V.fov,z=Math.min(10,Math.ceil(Math.log2(W/512))),SR=Math.min(innerWidth*.44,innerHeight*.40),N=0;
+ while(z>=3){N=Math.ceil(2*SR/(W/Math.pow(2,z+1)))+2;if(N<=7)break;z--}if(z<3)return;N=Math.max(3,N);   // 망원경 원 전체를 덮는 만큼 조각을 받음 (최대 7×7)
+
  MDT.ray.setFromCamera(new THREE.Vector2(0,0),C);var hit=MDT.ray.intersectObject(m,false)[0];if(!hit||!hit.uv)return;
- var nx=Math.pow(2,z+1),ny=Math.pow(2,z),N=4,cc=Math.floor(hit.uv.x*nx),rr=Math.floor((1-hit.uv.y)*ny),c0=Math.max(0,Math.min(nx-N,cc-1)),r0=Math.max(0,Math.min(ny-N,rr-1)),k=z+'/'+r0+'/'+c0;MDT.want=1;
+ var nx=Math.pow(2,z+1),ny=Math.pow(2,z),cc=Math.floor(hit.uv.x*nx),rr=Math.floor((1-hit.uv.y)*ny),c0=Math.max(0,Math.min(nx-N,cc-Math.floor(N/2))),r0=Math.max(0,Math.min(ny-N,rr-Math.floor(N/2))),k=z+'/'+r0+'/'+c0+'/'+N;MDT.want=1;
  if(k===MDT.k)return;MDT.k=k;var cv=document.createElement('canvas');cv.width=cv.height=256*N;var x=cv.getContext('2d'),tx=new THREE.CanvasTexture(cv),left=N*N,first=true;
  function show(){if(MDT.k!==k)return;tx.needsUpdate=true;if(first){first=false;MDU.dTex.value=tx;MDU.dB.value.set(c0/nx,1-(r0+N)/ny,(c0+N)/nx,1-r0/ny)}}
  x.fillStyle='#555';x.fillRect(0,0,cv.width,cv.height);
- for(var j=0;j<N;j++)for(var i=0;i<N;i++)(function(i,j){var im=new Image();im.crossOrigin='anonymous';im.onload=function(){if(MDT.k!==k)return;x.drawImage(im,i*256,j*256);if(--left<=N*N-4||left===0)show()};im.onerror=function(){--left};
+ try{var bi=m.material.uniforms.map.value.image;if(bi&&bi.width){x.drawImage(bi,c0/nx*bi.width,r0/ny*bi.height,N/nx*bi.width,N/ny*bi.height,0,0,cv.width,cv.height)}}catch(e){}   // 받기 전엔 원래 달 지도로 채워 둠 (회색 네모 안 보이게)
+ show();
+ for(var j=0;j<N;j++)for(var i=0;i<N;i++)(function(i,j){var im=new Image();im.crossOrigin='anonymous';im.onload=function(){if(MDT.k!==k)return;x.drawImage(im,i*256,j*256);if(--left===0||(N*N-left)%6===0)show()};im.onerror=function(){--left};
   var wac='https://trek.nasa.gov/tiles/Moon/EQ/LRO_WAC_Mosaic_Global_303ppd_v02/1.0.0/default/default028mm/'+z+'/'+(r0+j)+'/'+(c0+i)+'.jpg';
   im.onerror=function(){if(im.src!==wac&&z<=8){im.src=wac}else --left};
   im.src=z>=4?'https://trek.nasa.gov/tiles/Moon/EQ/Kaguya_TCortho_Mosaic_Global_4096ppd/1.0.0/default/default028mm/'+z+'/'+(r0+j)+'/'+(c0+i)+'.png':wac})(i,j)}
 /* 🚀 달 착륙 자리 : 망원경으로 달을 당기면 표시 (아폴로·창어·찬드라얀·SLIM·루나) */
-var LAND=[['🚀 아폴로 11호 · 1969 · 첫 발자국',0.6741,23.4730],['🚀 아폴로 12호 · 1969',-3.0124,-23.4216],['🚀 아폴로 14호 · 1971',-3.6453,-17.4714],['🚀 아폴로 15호 · 1971 · 첫 월면차',26.1322,3.6339],
- ['🚀 아폴로 16호 · 1972',-8.9730,15.5002],['🚀 아폴로 17호 · 1972 · 마지막 발자국',20.1908,30.7717],['🛰 루나 9호 · 1966 · 첫 연착륙',7.08,-64.37],['🛰 창어 3호 · 2013',44.1214,-19.5116],
+var LAND=[['🚀 아폴로 11호 · 1969 · 첫 발자국',0.6741,23.4730,'A11'],['🚀 아폴로 12호 · 1969',-3.0124,-23.4216],['🚀 아폴로 14호 · 1971',-3.6453,-17.4714,'A14'],['🚀 아폴로 15호 · 1971 · 첫 월면차',26.1322,3.6339,'A15'],
+ ['🚀 아폴로 16호 · 1972',-8.9730,15.5002,'A16'],['🚀 아폴로 17호 · 1972 · 마지막 발자국',20.1908,30.7717,'A17'],['🛰 루나 9호 · 1966 · 첫 연착륙',7.08,-64.37],['🛰 창어 3호 · 2013',44.1214,-19.5116],
  ['🛰 창어 4호 · 2019 · 뒷면 첫 착륙',-45.4446,177.5991],['🛰 찬드라얀 3호 · 2023',-69.373,32.319],['🛰 SLIM · 2024',-13.316,25.251]],LDIV=null,LANDT=0;
+/* 🔎 아폴로 착륙선 진짜 사진 (NASA LRO 근접 카메라 · 화소 50cm) : 착륙 자리를 끝까지 당기면 접안렌즈 아래에 띄움 */
+var LRB=null,LRK='';function lrocShow(n){if(!LRB){LRB=document.createElement('div');LRB.style.cssText='position:fixed;left:50%;transform:translateX(-50%);bottom:calc(50% - min(44vw,40vh) + 12px);z-index:7;pointer-events:none;background:rgba(5,7,15,.88);border-radius:14px;padding:8px;box-shadow:0 0 0 1px rgba(255,215,106,.5);text-align:center;display:none;width:min(62vw,300px)';document.body.appendChild(LRB)}
+ var k=n?n[2]:'';if(k===LRK)return;LRK=k;if(!k){LRB.style.display='none';return}
+ LRB.innerHTML='<img src="https://lroc.im-ldi.com/news/uploads/'+k+'LEMa_1000.png" alt="" style="width:100%;border-radius:8px;display:block" onerror="this.parentNode.style.display=\'none\'"><div style="font:800 11.5px var(--f);color:#ffe8a8;margin-top:6px">🔎 '+n[0].replace(/^\S+ /,'')+' 착륙선 (가운데 점) · 진짜 사진</div><div style="font:600 10px var(--f);color:#9fb0d8">NASA LRO 근접 카메라 · 화소 50cm · NASA/GSFC/Arizona State Univ.</div>';LRB.style.display='block'}
 function landTick(){var m=TEL.moonM;if(!LDIV){LDIV=document.createElement('div');LDIV.style.cssText='position:fixed;inset:0;z-index:6;pointer-events:none';document.body.appendChild(LDIV);
   LDIV.innerHTML=LAND.map(function(l){return '<div style="position:absolute;transform:translate(-50%,-100%);white-space:nowrap;font:800 11.5px var(--f);color:#ffe8a8;text-shadow:0 1px 3px #000,0 0 6px #000;display:none"><span style="display:block;text-align:center">'+l[0]+'</span><i style="display:block;width:7px;height:7px;margin:2px auto 0;border-radius:50%;border:1.5px solid #ffd76a"></i></div>'}).join('')}
  var show=m&&TEL.on&&m.visible&&V.fov<1.6&&MODE==='ar',els=LDIV.children,near=null;
- if(!show){for(var i=0;i<els.length;i++)els[i].style.display='none';return}
+ if(!show){lrocShow(null);for(var i=0;i<els.length;i++)els[i].style.display='none';return}
  var r=m.geometry.parameters.radius,cam=new THREE.Vector3();C.getWorldPosition(cam);var mc=m.getWorldPosition(new THREE.Vector3());
  LAND.forEach(function(l,i){var ph=(l[2]+180)/360*Math.PI*2,th=(90-l[1])*D2R,p=new THREE.Vector3(-r*Math.cos(ph)*Math.sin(th),r*Math.cos(th),r*Math.sin(ph)*Math.sin(th));m.localToWorld(p);
   var n=p.clone().sub(mc).normalize(),toC=cam.clone().sub(p).normalize(),e=els[i];if(n.dot(toC)<.08){e.style.display='none';return}
   var v=p.clone().project(C);if(Math.abs(v.x)>1.1||Math.abs(v.y)>1.1){e.style.display='none';return}var x=(v.x+1)/2*innerWidth,y=(1-v.y)/2*innerHeight;
-  var SR=Math.min(innerWidth*.44,innerHeight*.40)-18;if(Math.hypot(x-innerWidth/2,y-innerHeight/2)>SR){e.style.display='none';return}e.style.display='block';e.style.left=x+'px';e.style.top=(y+5)+'px';var dc=Math.hypot(x-innerWidth/2,y-innerHeight/2);if(dc<40&&(!near||dc<near[1]))near=[l[0],dc]});
- if(near&&V.fov<.004&&performance.now()-LANDT>15000){LANDT=performance.now();toast(near[0].replace(/^\S+ /,'')+' 자리예요 · 착륙선(약 4m)은 이 사진(약 20m 화소)보다 작아서 안 보여요 · 실제 잔해는 NASA LRO 근접 사진(50cm)에만 찍혀요',5200)}}
+  var SR=Math.min(innerWidth*.44,innerHeight*.40)-18;if(Math.hypot(x-innerWidth/2,y-innerHeight/2)>SR){e.style.display='none';return}e.style.display='block';e.style.left=x+'px';e.style.top=(y+5)+'px';var dc=Math.hypot(x-innerWidth/2,y-innerHeight/2);if(dc<40&&(!near||dc<near[1]))near=[l[0],dc,l[3]]});
+ lrocShow(near&&V.fov<.01&&near[2]?near:null);
+ if(near&&V.fov<.004&&performance.now()-LANDT>15000){LANDT=performance.now();toast(near[0].replace(/^\S+ /,'')+' 자리예요 · 착륙선(약 4m)은 지도(20m 화소)엔 안 보여서 '+(near[2]?'아래에 NASA 근접 사진(50cm)을 띄웠어요':'NASA LRO 근접 사진(50cm)에만 찍혀요'),5200)}}
 function loop(now){requestAnimationFrame(loop);var dt=Math.min(.1,(now-last)/1000);last=now;if(MODE!=='ar')return;
  var _q0=G3?G3.quaternion.clone():null;skySpin();if(_q0&&G3&&V.fov<1.5&&(!AR.on||AR.hold)){var dq=G3.quaternion.clone().multiply(_q0.invert());[['az','alt'],['taz','talt']].forEach(function(k){var v=skyPos(V[k[1]],V[k[0]],1).applyQuaternion(dq);V[k[1]]=Math.asin(Math.max(-1,Math.min(1,v.y)));V[k[0]]=Math.atan2(v.x,-v.z)})}telApply();telSeeing(now);dsoTick();tname();tguide();var da=((V.taz-V.az+Math.PI*3)%(Math.PI*2))-Math.PI,k=1-Math.exp(-dt*(AR.on?(TEL.t>0.02?4:7):14));V.az+=da*k;V.alt+=(V.talt-V.alt)*k;stickTick(dt);camUpd();cxTick(dt);try{labDeclutter()}catch(e){}try{moonDetail(now)}catch(e){}try{landTick()}catch(e){}R3.autoClear=true;R3.setScissorTest(false);R3.setViewport(0,0,innerWidth,innerHeight);R3.render(S,C);
  if(TEL.t>0.02)return;
@@ -1015,6 +1026,7 @@ tlab();sz2();build3();chips();requestAnimationFrame(loop);
 (function(){var q=new URLSearchParams(location.search),lk=q.get('look');if(q.get('card'))setTimeout(function(){var c=cxById(q.get('card'));if(c)card(c,'🌟 '+c.ko+' 발견! · 도감 10/88')},2500);if(q.get('off')){OFF=+q.get('off');build3()}if(!lk)return;var now=T(),L=skyLST(now,SKY.lon),aa;
  if(lk==='rd')aa=skyAA(+q.get('ra'),+q.get('dec'),L,SKY.lat);else if(lk==='해')aa=sunAA(now);else if(lk==='달')aa=moonAA(now);else{var pp=pxy(lk,pday(now));aa=skyAA(pp.ra,pp.dec,L,SKY.lat)}V.az=V.taz=aa[1];V.alt=V.talt=aa[0];if(q.get('tel'))telSet(+q.get('tel'))})();
 try{document.fonts.ready.then(function(){setTimeout(rebuild,50)})}catch(e){}
+try{fetch('hg_cxw.json').then(function(r){return r.json()}).then(function(j){CXD.forEach(function(c){if(j[c.ko]&&!HGN[c.ko]){HGN[c.ko]=j[c.ko];HGW[c.ko]=c.la}});rebuild()}).catch(function(){})}catch(e){}   // 88 별자리 모두 핸글 이름표 (밑에 영어 이름)
 if(/[?&]map/.test(location.search)){$('snd').remove();setMode('map')}else if(/[?&]sky/.test(location.search)){$('snd').remove();setMode('ar')}else autoStart();
 })();
 </script></body></html>

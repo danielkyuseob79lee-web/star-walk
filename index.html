@@ -795,7 +795,7 @@ function shape(c,ok){var P=[];c.L.forEach(function(pl){pl.forEach(function(q){P.
 
 /* ---------- 위치 · 시간 · 단추 ---------- */
 function locate(){if(!navigator.geolocation){toast('위치를 알 수 없어요');return}toast('📍 내 자리 찾는 중…');
- navigator.geolocation.getCurrentPosition(function(p){SKY.lat=p.coords.latitude;SKY.lon=p.coords.longitude;SKY.got=1;SKY.src='내 자리('+SKY.lat.toFixed(1)+'°N '+SKY.lon.toFixed(1)+'°E)';llSave();rebuild();chips();toast('📍 내 자리 하늘로 바꿨어요')},function(){toast('위치를 허락하지 않아 '+SKY.src+' 하늘을 보여요',3200)},{enableHighAccuracy:false,timeout:12000,maximumAge:600000})}
+ navigator.geolocation.getCurrentPosition(function(p){SKY.lat=p.coords.latitude;SKY.lon=p.coords.longitude;SKY.got=1;SKY.src='내 자리('+SKY.lat.toFixed(1)+'°N '+SKY.lon.toFixed(1)+'°E)';llSave();rebuild();chips();toast('📍 내 자리 하늘로 바꿨어요')},function(e){var c=e&&e.code;toast(c===1?'📍 위치 허용이 꺼져 있어요 · 브라우저(또는 폰) 설정에서 이 사이트 위치를 허용하면 내 자리 하늘이 나와요 · 지금은 '+SKY.src+' 하늘':(c===3?'📍 위치를 찾는 데 오래 걸려요 (실내?) · 지금은 '+SKY.src+' 하늘 · 📍를 다시 눌러 보세요':'📍 위치를 못 찾았어요 (GPS 꺼짐?) · 지금은 '+SKY.src+' 하늘'),4500)},{enableHighAccuracy:false,timeout:20000,maximumAge:1800000})}
 function chips(){var h='<button class="chip" id="cLoc">📍 '+esc((SKY.src||'').replace(/\(.*\)/,'')||'부산')+'</button>';
  if(MODE==='ar')h+='<button class="chip'+(AR.on?' on':'')+'" id="cAr">📱 폰 방향 '+(AR.on?'켜짐':'꺼짐')+'</button>';
  h+=wxChip();h+='<button class="chip" id="cEcl">🌘 일식·월식</button>';h+='<button class="chip'+(SHOWALL?' on':'')+'" id="cAll">✦ 별자리 선 '+(SHOWALL?'모두':'겨눌 때만')+'</button><button class="chip'+(ECLON?' on':'')+'" id="cEc">☉ 황도</button>';
@@ -837,6 +837,8 @@ function loop(now){requestAnimationFrame(loop);var dt=Math.min(.1,(now-last)/100
  var _q0=G3?G3.quaternion.clone():null;skySpin();if(_q0&&G3&&V.fov<1.5&&(!AR.on||AR.hold)){var dq=G3.quaternion.clone().multiply(_q0.invert());[['az','alt'],['taz','talt']].forEach(function(k){var v=skyPos(V[k[1]],V[k[0]],1).applyQuaternion(dq);V[k[1]]=Math.asin(Math.max(-1,Math.min(1,v.y)));V[k[0]]=Math.atan2(v.x,-v.z)})}telApply();telSeeing(now);dsoTick();tname();tguide();var da=((V.taz-V.az+Math.PI*3)%(Math.PI*2))-Math.PI,k=1-Math.exp(-dt*(AR.on?3:14));V.az+=da*k;V.alt+=(V.talt-V.alt)*k;camUpd();cxTick(dt);R3.autoClear=true;R3.setScissorTest(false);R3.setViewport(0,0,innerWidth,innerHeight);R3.render(S,C);
  if(TEL.t>0.02)return;
  var cw=Math.min(innerWidth*.42,230),ch=cw*1.25,cx=(innerWidth-cw)/2,cy=innerWidth>=900?92:160;   // 아래 가운데 (조작 줄 위)
+ // 캐릭터는 땅 위에 서 있음 : 하늘을 올려다볼수록 화면 아래로 내려가 사라짐 (하늘에 따라다니지 않게)
+ var lookUp=Math.max(0,V.alt*R2D-4);cy-=lookUp*ch/18;if(cy+ch<=0)return;
  var turn=da*k/Math.max(dt,.001);TURN+=(Math.max(-1,Math.min(1,turn*.25))-TURN)*Math.min(1,dt*6);ME.rotation.y=Math.PI-TURN*.5;
  R3.autoClear=false;R3.clearDepth();R3.setScissorTest(true);R3.setScissor(cx,cy,cw,ch);R3.setViewport(cx,cy,cw,ch);CC.aspect=cw/ch;CC.updateProjectionMatrix();R3.render(CS,CC);R3.setScissorTest(false);R3.autoClear=true}
 try{cxhgLoad()}catch(e){}

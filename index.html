@@ -336,7 +336,8 @@ function drawMoon(age){var x=MCV.getContext('2d'),c=64,r=40,wax=age<.5,k=Math.co
 function moonName(a){return a<.03||a>.97?['🌑','그믐·삭']:a<.22?['🌒','초승달']:a<.28?['🌓','상현달(반달)']:a<.47?['🌔','차오르는 달']:a<.53?['🌕','보름달']:a<.72?['🌖','기우는 달']:a<.78?['🌗','하현달(반달)']:['🌘','그믐달']}
 
 /* ================================================================ 별자리 산책 (독립 앱) — 하늘 비추기(3D·폰 방향) + 별자리판(2D 성좌판) */
-window.__t0=performance.now();var DAY=false,MODE='ar',OFF=0,TILL=0,SHOWALL=false,ECLON=true,DPR=Math.min(2,devicePixelRatio||1);
+window.__t0=performance.now();var DAY=false,MODE='ar',OFF=0,TILL=0,SHOWALL=false,ECLON=true,DPR=window.MkjTTS?1:Math.min(2,devicePixelRatio||1);   // 매커조 앱 안 : 가볍게 (메모리)
+
 function T(){return new Date(Date.now()+OFF*60000)}
 function toast(m,ms){var t=document.createElement('div');t.className='toast';t.textContent=m;document.body.appendChild(t);setTimeout(function(){t.remove()},ms||2600)}
 function esc(s){return String(s==null?'':s).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]})}

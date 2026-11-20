@@ -118,6 +118,8 @@ button{font:inherit;color:inherit;border:0;background:none;cursor:pointer;paddin
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script src="star_conf.js" onerror="void 0"></script>
+<!-- 브이월드 인증키 : 공개 저장소에 안 올리고 매커조 서버(web 폴더의 star_conf.js)에서 받아 옴 · 없으면 위성사진 땅만 빠짐 -->
+<script async src="https://www.makajoe.com/star_conf.js" onload="try{window.dispatchEvent(new Event('vwkey'))}catch(e){}" onerror="void 0"></script>
 <script>
 (function(){
 if(!window.THREE){document.getElementById('start').querySelector('p').textContent='별 그림을 불러오지 못했어요 (three.min.js)';return}
@@ -666,6 +668,7 @@ function terrain(){var lat=SKY.lat,lon=SKY.lon,k=lat.toFixed(3)+','+lon.toFixed(
   im.onerror=function(){if(--left===0)done()};im.src='https://s3.amazonaws.com/elevation-tiles-prod/terrarium/'+z+'/'+x+'/'+y+'.png'})(tx+dx,ty+dy)}
 /* ---------- 🛰 위성사진 땅 (브이월드 · 열쇠는 star_conf.js 의 VWORLD_KEY) ---------- */
 var SAT={k:''};
+addEventListener('vwkey',function(){try{satGround()}catch(e){}});   // 인증키가 늦게 도착해도 (매커조 서버에서 받아 옴) 그때 땅을 깖
 function satGround(){var key=window.VWORLD_KEY;if(!key||!GROUND)return;var lat=SKY.lat,lon=SKY.lon,k=lat.toFixed(4)+','+lon.toFixed(4);if(SAT.k===k)return;SAT.k=k;
  var z=17,n=1<<z,fx=(lon+180)/360*n,fy=(1-Math.log(Math.tan(lat*D2R)+1/Math.cos(lat*D2R))/Math.PI)/2*n,tx=Math.floor(fx),ty=Math.floor(fy),
   c=document.createElement('canvas');c.width=c.height=768;var x=c.getContext('2d'),left=9,bad=0,cx=(fx-tx+1)*256,cy=(fy-ty+1)*256,mpp=156543.03*Math.cos(lat*D2R)/n;

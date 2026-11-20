@@ -475,10 +475,10 @@ function found(id){var c=cxById(id),m=cxAll();if(!c)return;m[id]={t:Date.now(),p
 /* ---------- 폰 방향 ---------- */
 var AR={on:0,ok:0,a:0,b:0,g:0,scr:0,hold:0,v:null,told:0,dAz:0,dAlt:0,raz:0,ralt:0};
 var LBL_ON=true;try{LBL_ON=localStorage.getItem('star_lbl')!=='0'}catch(e){}
-var SENS=1;try{var _s=localStorage.getItem('star_sens');if(_s!=null)SENS=Math.max(0,Math.min(2,+_s))}catch(e){}
+var SENS=1;try{var _s=localStorage.getItem('star_sens2');if(_s!=null)SENS=Math.max(0,Math.min(3,+_s))}catch(e){}   /* 감도 4단계 : 아주 느리게 · 느리게(기본) · 보통 · 빠르게 */
 /* 폰 방향 → 화면 : 맨눈일 땐 폰이 가리키는 곳 그대로(현실감) · 🔭 망원경일 땐 배율이 클수록 폰 움직임을 줄여서 따라감 (손떨림에 달이 안 빠져나가게) */
 function arApply(){var paz=AR.raz,pal=AR.ralt;
- if(TEL.t>0.02){var s=[.6,1,1.5][SENS]*Math.max(.08,Math.min(1,Math.pow(V.fov/62,.32)));
+ if(TEL.t>0.02){var s=[.4,.6,1,1.5][SENS]*Math.max(.08,Math.min(1,Math.pow(V.fov/62,.32)));
   if(!AR.anc||Math.abs(s-AR.anc.s)>.03)AR.anc={pa:paz,pl:pal,va:(AR.anc?AR.anc.va+wrapPi(paz-AR.anc.pa)*AR.anc.s:paz),vl:(AR.anc?AR.anc.vl+(pal-AR.anc.pl)*AR.anc.s:pal),s:s};
   var A=AR.anc;
   paz=A.va+wrapPi(paz-A.pa)*A.s;pal=Math.max(-1.4,Math.min(1.5,A.vl+(pal-A.pl)*A.s))}else AR.anc=null;
@@ -496,7 +496,7 @@ function arEv(e){if(e.alpha==null&&e.webkitCompassHeading==null)return;if(e.type
  var n=skyPos(d[1],d[0],1),tn=performance.now();
  if(!AR.v){AR.v=n.clone();AR.tv=tn;AR.sp=0}else{var dt=Math.max(.008,Math.min(.2,(tn-AR.tv)/1000));AR.tv=tn;
   var ang=AR.v.angleTo(n),vel=ang/dt;AR.sp+=(vel-AR.sp)*Math.min(1,dt*8);   // 돌리는 속도 (라디안/초, 부드럽게)
-  var mc=[.25,.45,.8][SENS],fc=mc+(SENS===0?.6:1.2)*AR.sp*R2D/10,a=1-Math.exp(-2*Math.PI*fc*dt);   // 차단 주파수: 느리게 돌리면 낮게 · 빠르면 높게
+  var mc=[.12,.25,.45,.8][SENS],fc=mc+(SENS<=1?(SENS===0?.35:.6):1.2)*AR.sp*R2D/10,a=1-Math.exp(-2*Math.PI*fc*dt);   // 차단 주파수: 느리게 돌리면 낮게 · 빠르면 높게
   if(ang>25*D2R)a=1;AR.v.lerp(n,a).normalize()}
  AR.ralt=Math.asin(Math.max(-1,Math.min(1,AR.v.y)));AR.raz=Math.atan2(AR.v.x,-AR.v.z);arApply()}
 function arOn(){function go(){AR.on=1;AR.dAz=0;AR.dAlt=0;AR.ok=0;addEventListener('deviceorientationabsolute',arEv,true);addEventListener('deviceorientation',arEv,true);chips();
@@ -835,9 +835,9 @@ function thumbPos(){try{var b=document.querySelector('.bot').offsetHeight;$('sti
 addEventListener('resize',function(){setTimeout(thumbPos,50)});
 function chips(){setTimeout(thumbPos,0);var h='<button class="chip" id="cLoc">📍 '+esc((SKY.src||'').replace(/\(.*\)/,'')||'부산')+'</button>';
  if(MODE==='ar')h+='<button class="chip'+(AR.on?' on':'')+'" id="cAr">📱 폰 방향 '+(AR.on?'켜짐':'꺼짐')+'</button>';
- h+=wxChip();if(MODE==='ar')h+='<button class="chip" id="cSn">🎚 감도 '+['느리게','보통','빠르게'][SENS]+'</button>';h+='<button class="chip'+(LBL_ON?' on':'')+'" id="cLb">🏷 이름표 '+(LBL_ON?'켬':'숨김')+'</button>';h+='<button class="chip" id="cEcl">🌘 일식·월식</button>';h+='<button class="chip'+(SHOWALL?' on':'')+'" id="cAll">✦ 별자리 선 '+(SHOWALL?'모두':'겨눌 때만')+'</button><button class="chip'+(ECLON?' on':'')+'" id="cEc">☉ 황도</button>';
+ h+=wxChip();if(MODE==='ar')h+='<button class="chip" id="cSn">🎚 감도 '+['아주 느리게','느리게','보통','빠르게'][SENS]+'</button>';h+='<button class="chip'+(LBL_ON?' on':'')+'" id="cLb">🏷 이름표 '+(LBL_ON?'켬':'숨김')+'</button>';h+='<button class="chip" id="cEcl">🌘 일식·월식</button>';h+='<button class="chip'+(SHOWALL?' on':'')+'" id="cAll">✦ 별자리 선 '+(SHOWALL?'모두':'겨눌 때만')+'</button><button class="chip'+(ECLON?' on':'')+'" id="cEc">☉ 황도</button>';
  
- $('chips').innerHTML=h;$('cLoc').onclick=locate;if($('cLb'))$('cLb').onclick=function(){LBL_ON=!LBL_ON;try{localStorage.setItem('star_lbl',LBL_ON?'1':'0')}catch(e){}chips()};if($('cSn'))$('cSn').onclick=function(){SENS=(SENS+1)%3;try{localStorage.setItem('star_sens',SENS)}catch(e){}AR.anc=null;chips();toast('🎚 폰 감도 '+['느리게 (떨림 많이 잡음)','보통','빠르게 (바로 따라감)'][SENS],1800)};if($('cWx'))$('cWx').onclick=wxToggle;$('cEcl').onclick=eclSheet;if($('cAr'))$('cAr').onclick=function(){AR.on?arOff():arOn()};
+ $('chips').innerHTML=h;$('cLoc').onclick=locate;if($('cLb'))$('cLb').onclick=function(){LBL_ON=!LBL_ON;try{localStorage.setItem('star_lbl',LBL_ON?'1':'0')}catch(e){}chips()};if($('cSn'))$('cSn').onclick=function(){SENS=(SENS+1)%4;try{localStorage.setItem('star_sens2',SENS)}catch(e){}AR.anc=null;chips();toast('🎚 폰 감도 '+['아주 느리게 (천천히 따라감 · 떨림 거의 없음)','느리게 (떨림 많이 잡음)','보통','빠르게 (바로 따라감)'][SENS],1800)};if($('cWx'))$('cWx').onclick=wxToggle;$('cEcl').onclick=eclSheet;if($('cAr'))$('cAr').onclick=function(){AR.on?arOff():arOn()};
  $('cAll').onclick=function(){SHOWALL=!SHOWALL;chips();draw2()};$('cEc').onclick=function(){ECLON=!ECLON;chips();rebuild()};
  if($('cFl'))$('cFl').onclick=function(){skyFlip(SKYPH?0:1);FLIPHOLD=Date.now()+20000;chips()}}
 var FLIPHOLD=0;setInterval(function(){if(MODE!=='ar'||Date.now()<FLIPHOLD)return;skyFlip(SKYPH?0:1)},3500);

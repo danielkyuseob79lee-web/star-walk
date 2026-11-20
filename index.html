@@ -349,7 +349,7 @@ var ECLB=null;
 var MCV=document.createElement('canvas');MCV.width=MCV.height=128;var MCRA=null;var MTX={needsUpdate:false};
 
 /* ---------- 3D 하늘 ---------- */
-var R3=new THREE.WebGLRenderer({antialias:true});R3.setPixelRatio(DPR);R3.setSize(innerWidth,innerHeight);R3.setClearColor('#04060d');$('v3').appendChild(R3.domElement);
+var R3=new THREE.WebGLRenderer(window.MkjTTS?{antialias:false,powerPreference:'low-power'}:{antialias:true});   /* 매커조 앱 안 : 그래픽이 약한 태블릿에서 멈추지 않게 가볍게 */R3.setPixelRatio(DPR);R3.setSize(innerWidth,innerHeight);R3.setClearColor('#04060d');$('v3').appendChild(R3.domElement);
 var S=new THREE.Scene(),C=new THREE.PerspectiveCamera(62,innerWidth/innerHeight,1,6000);
 STARU.uPR.value=DPR;MWU.uOp.value=.85;
 var V={az:Math.PI,alt:.55,taz:Math.PI,talt:.55,fov:62};
@@ -642,7 +642,7 @@ return 62*Math.pow(mx/62,TEL.t)}
 var MCAP=0;function telApply(){var on=TEL.t>0.02,f=telFov();if(MDT&&MDT.want&&f<0.0026){f=0.0026;if(!MCAP){MCAP=1;toast('🌕 달은 여기까지가 실제 사진(일본 가구야 위성 · 약 20m) 한계예요 · 더 당기면 흐려져서 멈췄어요',3800)}}else if(f>0.004)MCAP=0;
  // 🔭 망원경을 쓰는 동안은 폰 방향을 따라가지 않고 멈춤 (손 떨림 없이) · 손가락으로 조금씩 옮김 · 다시 줄이면 폰 방향으로
  var hd=false;   // 망원경도 폰을 따라 움직임 (진짜처럼) · 대신 아래에서 부드럽게 잡음
-if(hd!==!!AR.hold){AR.hold=hd?1:0;AR.v=null;if(hd&&!AR.told){AR.told=1;toast('🔭 망원경을 쓰는 동안은 화면이 멈춰요 · 손가락으로 살살 끌어 옮겨요 · 다시 줄이면 폰 방향으로',3800)}}V.fov=on?f:62;var vis=V.fov<15;
+if(hd!==!!AR.hold){AR.hold=hd?1:0;AR.v=null;if(hd&&!AR.told){AR.told=1;toast('🔭 망원경을 쓰는 동안은 화면이 멈춰요 · 손가락으로 살살 끌어 옮겨요 · 다시 줄이면 폰 방향으로',3800)}}V.fov=on?f:62/(PZ||1);var vis=V.fov<15;
  if(vis!==TEL.on){TEL.on=vis;var mine=TEL.discs.concat(TEL.moons,TEL.moonM?[TEL.moonM]:[],DSOM,TEL.sunD?[TEL.sunD]:[]);
   G3&&G3.traverse(function(o){if(mine.indexOf(o)>=0)return;if(o.isSprite||(o.isMesh&&o!==G3)){if(vis){o.userData.vis0=o.visible;o.visible=false}else if(o.userData.vis0!=null)o.visible=o.userData.vis0}});
   TEL.discs.concat(TEL.moons).forEach(function(o){o.visible=vis});if(TEL.moonM)TEL.moonM.visible=true;MWU.uOp.value=vis?0:.85}
@@ -749,10 +749,10 @@ function eclSheet(){if(!ECLS)ECLS=eclFind(3);var h='<div class="card" style="max
   toast(aa[0]>0?'그 시각의 하늘이에요 · 망원경으로 당겨 보세요':'그 시각 여기서는 지평선 아래예요 (다른 나라에서 보여요)',3500)}})}
 
 /* ---------- 손가락 (3D: 끌어 둘러보기·두 손가락 확대 / 2D: 돌리기·확대) ---------- */
-var PT={},pinch0=0,fov0=62,z0=1;
-function ptDown(e){PT[e.pointerId]={x:e.clientX,y:e.clientY,x0:e.clientX,y0:e.clientY,t:Date.now()};var ks=Object.keys(PT);if(ks.length===2){TEL.t0=TEL.t;var a=PT[ks[0]],b=PT[ks[1]];pinch0=Math.hypot(a.x-b.x,a.y-b.y);fov0=V.fov;z0=M2.z;M2.r0=M2.rot;M2.a0=Math.atan2(b.y-a.y,b.x-a.x)}}
+var PT={},pinch0=0,fov0=62,z0=1,PZ=1,pz0=1;   /* PZ : 두 손가락 화면 확대 (망원경과 따로 · 1~4배) */
+function ptDown(e){PT[e.pointerId]={x:e.clientX,y:e.clientY,x0:e.clientX,y0:e.clientY,t:Date.now()};var ks=Object.keys(PT);if(ks.length===2){TEL.t0=TEL.t;var a=PT[ks[0]],b=PT[ks[1]];pinch0=Math.hypot(a.x-b.x,a.y-b.y);fov0=V.fov;z0=M2.z;pz0=PZ;M2.r0=M2.rot;M2.a0=Math.atan2(b.y-a.y,b.x-a.x)}}
 function ptMove(e){var p=PT[e.pointerId];if(!p)return;var dx=e.clientX-p.x,dy=e.clientY-p.y;p.x=e.clientX;p.y=e.clientY;var ks=Object.keys(PT);
- if(ks.length===2){var a=PT[ks[0]],b=PT[ks[1]],d=Math.hypot(a.x-b.x,a.y-b.y);if(MODE==='ar'){telSet(TEL.t0+Math.log(d/pinch0)/Math.log(62/(TEL.pro?0.0008:0.55))*1.6)}else{M2.z=Math.max(1,Math.min(4,z0*d/pinch0));M2.rot=M2.r0+(Math.atan2(b.y-a.y,b.x-a.x)-M2.a0);draw2()}return}
+ if(ks.length===2){var a=PT[ks[0]],b=PT[ks[1]],d=Math.hypot(a.x-b.x,a.y-b.y);if(MODE==='ar'){PZ=Math.max(1,Math.min(4,pz0*d/pinch0))}   /* 슬라이드 = 망원경 · 두 손가락 = 그냥 화면 확대 */else{M2.z=Math.max(1,Math.min(4,z0*d/pinch0));M2.rot=M2.r0+(Math.atan2(b.y-a.y,b.x-a.x)-M2.a0);draw2()}return}
  if(MODE==='ar'){var k=V.fov/innerHeight*D2R*1.1;if(AR.on&&!AR.hold){AR.dAz-=dx*k;AR.dAlt=Math.max(-1.4,Math.min(1.4,AR.dAlt+dy*k));arApply();return}V.taz-=dx*k;V.talt=Math.max(-1.2,Math.min(1.5,V.talt+dy*k));}
  else{if(M2.z>1.02){M2.px+=dx;M2.py+=dy}else{var cx=innerWidth/2,cy=M2.cy,a1=Math.atan2(p.y-dy-cy,p.x-dx-cx),a2=Math.atan2(p.y-cy,p.x-cx);M2.rot+=a2-a1}draw2()}}
 function ptUp(e){var p=PT[e.pointerId];delete PT[e.pointerId];if(!p)return;if(Math.hypot(p.x-p.x0,p.y-p.y0)<8&&Date.now()-p.t<400)tap(p.x,p.y)}
@@ -843,7 +843,8 @@ function chips(){setTimeout(thumbPos,0);var h='<button class="chip" id="cLoc">�
 var FLIPHOLD=0;setInterval(function(){if(MODE!=='ar'||Date.now()<FLIPHOLD)return;skyFlip(SKYPH?0:1)},3500);
 function tlab(){if(Math.abs(OFF)>720){var dx=T();$('tl').textContent=dx.getFullYear()+'.'+(dx.getMonth()+1)+'.'+dx.getDate()+' '+('0'+dx.getHours()).slice(-2)+':'+('0'+dx.getMinutes()).slice(-2);return}setTimeout(function(){var t=$('tl');if(t&&DAY&&t.textContent.indexOf('낮')<0)t.textContent+=' · 낮'},80);var d=T(),h=d.getHours(),m=d.getMinutes(),day=d.getDate()!==new Date().getDate()?(d<new Date()?'어제 ':'내일 '):(OFF?'오늘 ':'');$('tl').textContent=OFF?day+(h<12?'오전 ':'오후 ')+((h+11)%12+1)+':'+('0'+m).slice(-2):'지금 '+((h+11)%12+1)+':'+('0'+m).slice(-2)}
 var RB=0;function rebuild(){clearTimeout(RB);RB=setTimeout(function(){if(MODE==='ar'){build3();try{terrain()}catch(e){}try{satGround()}catch(e){}}draw2();tlab()},60)}
-$('tr').oninput=function(){OFF=+this.value;rebuild()};$('tn').onclick=function(){OFF=0;$('tr').value=0;rebuild()};
+/* 시간 막대 : 끄는 동안엔 시각 글자만 바꾸고, 손을 멈추거나 떼면 하늘을 다시 그림 (끄는 내내 하늘 전체를 다시 만들어 약한 태블릿이 멈추던 것) */
+$('tr').oninput=function(){OFF=+this.value;try{tlab()}catch(e){}if(MODE!=='ar')rebuild();else{clearTimeout(RB);RB=setTimeout(function(){rebuild()},window.MkjTTS?450:250)}};$('tr').onchange=function(){OFF=+this.value;rebuild()};$('tn').onclick=function(){OFF=0;$('tr').value=0;rebuild()};
 setInterval(function(){if(!OFF){rebuild()}},600000);
 function setMode(m){MODE=m;[].forEach.call(document.querySelectorAll('.seg button'),function(b){b.classList.toggle('on',b.dataset.m===m)});
  $('v3').hidden=m!=='ar';$('tel').hidden=m!=='ar';$('stick').hidden=m!=='ar';if(m!=='ar'){telSet(0);$('scope').hidden=true}$('v2').hidden=m!=='map';$('ring').hidden=m!=='ar';$('tgt').hidden=true;$('arw').hidden=true;closeCard();

@@ -117,6 +117,7 @@ button{font:inherit;color:inherit;border:0;background:none;cursor:pointer;paddin
 <div id="dg" hidden></div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="GLTFLoader.js" onerror="void 0"></script>
 <script src="star_conf.js" onerror="void 0"></script>
 <!-- 브이월드 인증키 : 공개 저장소에 안 올리고 매커조 서버(web 폴더의 star_conf.js)에서 받아 옴 · 없으면 위성사진 땅만 빠짐 -->
 <script async src="https://www.makajoe.com/star_conf.js" onload="try{window.dispatchEvent(new Event('vwkey'))}catch(e){}" onerror="void 0"></script>
@@ -382,6 +383,17 @@ function person(o){var g=new THREE.Group(),body=new THREE.Group();g.add(body);va
  armR.rotation.x=-2.3;armL.rotation.x=-.3;                        // 오른팔을 들어 하늘을 가리킴
  g.userData={head:head,armR:armR};return g}
 var ME=person({coat:'#4a7ac8',pants:'#eee8da'});var CS=new THREE.Scene();CS.add(ME);CS.add(new THREE.HemisphereLight('#9fb0e8','#1a2a1c',1.1));var CL=new THREE.DirectionalLight('#dfe6ff',.6);CL.position.set(-2,4,3);CS.add(CL);
+/* 🐒 매커조 원숭이 (리깅된 모델 · 걷기 동작) : 불러오면 블록 아이 대신 섬 — 못 불러오면 아이 그대로 */
+var MK={mix:null,act:null,w:0};
+(function(){if(!THREE.GLTFLoader)return;try{new THREE.GLTFLoader().load('monkey.glb',function(g){try{
+ var m=g.scene,bn=[],P=new THREE.Vector3();m.traverse(function(o){if(o.isBone)bn.push(o)});if(!bn.length)return;
+ /* 크기는 뼈대로 잼 (리깅된 모델은 겉 상자 크기가 실제 보이는 크기와 다름) : 키 약 1.75 · 발이 땅에 · 몸 가운데가 원점 */
+ function ext(){m.updateMatrixWorld(true);var lo=1e9,hi=-1e9;bn.forEach(function(b){P.setFromMatrixPosition(b.matrixWorld);if(P.y<lo)lo=P.y;if(P.y>hi)hi=P.y});return [lo,hi]}
+ var e0=ext(),hh=e0[1]-e0[0];if(!(hh>0))return;m.scale.multiplyScalar(1.58/hh);var e1=ext();P.setFromMatrixPosition(bn[0].matrixWorld);m.position.set(-P.x,-e1[0]+.04,-P.z);
+ m.traverse(function(o){if(o.isMesh){o.frustumCulled=false;var mt=o.material;if(mt){if(mt.map)mt.map.encoding=THREE.sRGBEncoding;mt.metalness=0;mt.roughness=.9;mt.normalMap=null;mt.metalnessMap=null;mt.roughnessMap=null;mt.side=THREE.FrontSide;mt.needsUpdate=true}}});
+ ME.children.forEach(function(c){c.visible=false});ME.add(m);MK.model=m;
+ MK.mix=new THREE.AnimationMixer(m);var cl=(g.animations||[]).filter(function(a){return /walk/i.test(a.name)})[0]||g.animations[0];
+ if(cl){MK.act=MK.mix.clipAction(cl);MK.act.play();MK.act.paused=true;MK.mix.update(0)}}catch(e){console.warn('monkey',e)}},undefined,function(){})}catch(e){}})();
 var CC=new THREE.PerspectiveCamera(30,1,.1,50);CC.position.set(0,2.3,4.6);CC.lookAt(0,1.0,0);   // 캐릭터 전용 카메라 : 화면 아래 가운데에 뒷모습
 
 var RS=1150,G3=null,LBL=[];
@@ -504,7 +516,7 @@ function arEv(e){if(e.alpha==null&&e.webkitCompassHeading==null)return;if(e.type
 function arOn(){function go(){AR.on=1;AR.dAz=0;AR.dAlt=0;AR.ok=0;addEventListener('deviceorientationabsolute',arEv,true);addEventListener('deviceorientation',arEv,true);chips();
   setTimeout(function(){if(AR.on&&!AR.ok){AR.on=0;chips();toast('이 기기는 방향 센서가 없어요 · 손가락으로 끌어 둘러보세요',3500)}},2500)}
  if(typeof DeviceOrientationEvent!=='undefined'&&DeviceOrientationEvent.requestPermission)DeviceOrientationEvent.requestPermission().then(function(r){if(r==='granted')go();else toast('방향 센서를 허락해 주세요')}).catch(go);else go()}
-function arOff(){AR.on=0;removeEventListener('deviceorientationabsolute',arEv,true);removeEventListener('deviceorientation',arEv,true);chips()}
+function arOff(){AR.on=0;V.talt=Math.max(-.35,Math.min(1.5,V.talt));V.alt=Math.max(-.35,Math.min(1.5,V.alt));removeEventListener('deviceorientationabsolute',arEv,true);removeEventListener('deviceorientation',arEv,true);chips()}
 
 
 
@@ -756,7 +768,7 @@ var PT={},pinch0=0,fov0=62,z0=1,PZ=1,pz0=1;   /* PZ : 두 손가락 화면 확�
 function ptDown(e){PT[e.pointerId]={x:e.clientX,y:e.clientY,x0:e.clientX,y0:e.clientY,t:Date.now()};var ks=Object.keys(PT);if(ks.length===2){TEL.t0=TEL.t;var a=PT[ks[0]],b=PT[ks[1]];pinch0=Math.hypot(a.x-b.x,a.y-b.y);fov0=V.fov;z0=M2.z;pz0=PZ;M2.r0=M2.rot;M2.a0=Math.atan2(b.y-a.y,b.x-a.x)}}
 function ptMove(e){var p=PT[e.pointerId];if(!p)return;var dx=e.clientX-p.x,dy=e.clientY-p.y;p.x=e.clientX;p.y=e.clientY;var ks=Object.keys(PT);
  if(ks.length===2){var a=PT[ks[0]],b=PT[ks[1]],d=Math.hypot(a.x-b.x,a.y-b.y);if(MODE==='ar'){PZ=Math.max(1,Math.min(4,pz0*d/pinch0))}   /* 슬라이드 = 망원경 · 두 손가락 = 그냥 화면 확대 */else{M2.z=Math.max(1,Math.min(4,z0*d/pinch0));M2.rot=M2.r0+(Math.atan2(b.y-a.y,b.x-a.x)-M2.a0);draw2()}return}
- if(MODE==='ar'){var k=V.fov/innerHeight*D2R*1.1;if(AR.on&&!AR.hold){AR.dAz-=dx*k;AR.dAlt=Math.max(-1.4,Math.min(1.4,AR.dAlt+dy*k));arApply();return}V.taz-=dx*k;V.talt=Math.max(-1.2,Math.min(1.5,V.talt+dy*k));}
+ if(MODE==='ar'){var k=V.fov/innerHeight*D2R*1.1;if(AR.on&&!AR.hold){AR.dAz-=dx*k;AR.dAlt=Math.max(-1.4,Math.min(1.4,AR.dAlt+dy*k));arApply();return}V.taz-=dx*k;V.talt=Math.max(-.35,Math.min(1.5,V.talt+dy*k));}
  else{if(M2.z>1.02){M2.px+=dx;M2.py+=dy}else{var cx=innerWidth/2,cy=M2.cy,a1=Math.atan2(p.y-dy-cy,p.x-dx-cx),a2=Math.atan2(p.y-cy,p.x-cx);M2.rot+=a2-a1}draw2()}}
 function ptUp(e){var p=PT[e.pointerId];delete PT[e.pointerId];if(!p)return;if(Math.hypot(p.x-p.x0,p.y-p.y0)<8&&Date.now()-p.t<400)tap(p.x,p.y)}
 ['v3','v2'].forEach(function(id){var el=$(id);el.addEventListener('pointerdown',ptDown);el.addEventListener('pointermove',ptMove);el.addEventListener('pointerup',ptUp);el.addEventListener('pointercancel',ptUp);
@@ -900,7 +912,7 @@ var STK={x:0,y:0,id:null};(function(){var el=$('stick'),kn=el.firstChild;
  function up(e){if(STK.id!==e.pointerId)return;STK.id=null;STK.x=STK.y=0;kn.style.transform=''}el.addEventListener('pointerup',up);el.addEventListener('pointercancel',up)})();
 function stickTick(dt){if(MODE!=='ar'||(!STK.x&&!STK.y))return;var sp=V.fov*D2R*(AR.on?.18:.45)*dt,   // 폰으로 크게 · 스틱은 미세 조정 (화면 폭의 1/5 정도/초)
  ax=STK.x*Math.abs(STK.x),ay=STK.y*Math.abs(STK.y);
- if(AR.on&&!AR.hold){AR.dAz+=ax*sp;AR.dAlt=Math.max(-1.4,Math.min(1.4,AR.dAlt-ay*sp));arApply()}else{V.taz+=ax*sp;V.talt=Math.max(-1.2,Math.min(1.5,V.talt-ay*sp))}}
+ if(AR.on&&!AR.hold){AR.dAz+=ax*sp;AR.dAlt=Math.max(-1.4,Math.min(1.4,AR.dAlt-ay*sp));arApply()}else{V.taz+=ax*sp;V.talt=Math.max(-.35,Math.min(1.5,V.talt-ay*sp))}}
 /* 🌕 달 확대 : 당길수록 NASA 달 정찰위성(LRO) 실제 지도 조각을 받아 그 자리만 고화질로 (100m 급) */
 var MDT={k:'',cv:null,x:null,t:0,ray:new THREE.Raycaster(),want:0};
 function moonDetail(now){var m=TEL.moonM;MDU.dOn.value+=((MDT.want)-MDU.dOn.value)*.08;if(now-MDT.t<350)return;MDT.t=now;MDT.want=0;
@@ -944,6 +956,7 @@ function loop(now){requestAnimationFrame(loop);var dt=Math.min(.1,(now-last)/100
  // 캐릭터는 땅 위에 서 있음 : 하늘을 올려다볼수록 화면 아래로 내려가 사라짐 (하늘에 따라다니지 않게)
  var lookUp=Math.max(0,V.alt*R2D-4);cy-=lookUp*ch/18;if(cy+ch<=0)return;
  var turn=da*k/Math.max(dt,.001);TURN+=(Math.max(-1,Math.min(1,turn*.25))-TURN)*Math.min(1,dt*6);ME.rotation.y=Math.PI-TURN*.5;
+ if(MK.mix&&MK.act){var mv=Math.abs(TURN)>.06||!!(STK.x||STK.y);MK.w+=((mv?1:0)-MK.w)*Math.min(1,dt*5);MK.act.paused=MK.w<.05;if(!MK.act.paused)MK.mix.update(dt*(.5+MK.w*.6))}   /* 돌거나 스틱을 밀 때만 걷는 동작 */
  R3.autoClear=false;R3.clearDepth();R3.setScissorTest(true);R3.setScissor(cx,cy,cw,ch);R3.setViewport(cx,cy,cw,ch);CC.aspect=cw/ch;CC.updateProjectionMatrix();R3.render(CS,CC);R3.setScissorTest(false);R3.autoClear=true}
 try{cxhgLoad()}catch(e){}
 /* ☀️ 하늘색(해 높이 따라 낮·노을·밤) · 🌤 실제 날씨(Open-Meteo, 열쇠 필요 없음) · 🕶 망원경 태양 필터 */

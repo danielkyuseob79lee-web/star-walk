@@ -1334,7 +1334,7 @@ var _r3r=R3.render.bind(R3);R3.render=function(sc,cam){_r3r(sc,cam);if(sc===S&&c
 (function prbLoop(t){requestAnimationFrame(prbLoop);var dt=Math.min(.1,((t||0)-(PRB.t0||t||0))/1000);PRB.t0=t;try{prbTick(dt)}catch(e){}})();
 /* 🔎 아폴로 착륙지 깊이 보기 : NASA LRO 근접 카메라(NAC) 모자이크를 NASA Trek 조각으로 받아 착륙선·발자국까지 당겨 봐요 */
 try{LAND[1][3]='A12'}catch(e){}
-var APO={A11:['LRO_NAC_Apollo11_Mosaic_p',15,'이글','50cm'],A12:['LRO_NAC_Apollo12_Mosaic_p',16,'인트레피드','50cm'],A14:['LRO_NAC_Apollo14_Mosaic_p',15,'안타레스','50cm'],A15:['LRO_NAC_Apollo15_Mosaic_p',16,'팔콘','50cm'],A16:['LRO_NAC_Mosaic_09S015E_50cmp',15,'오리온','50cm'],A17:['NAC_DTM_APOLLO17_MOSAIC_120CM',14,'챌린저','1.2m']};
+var APO={A11:['LRO_NAC_Apollo11_Mosaic_p',15,'이글','50cm',[0.67364,23.47319]],A12:['LRO_NAC_Apollo12_Mosaic_p',16,'인트레피드','50cm'],A14:['LRO_NAC_Apollo14_Mosaic_p',15,'안타레스','50cm'],A15:['LRO_NAC_Apollo15_Mosaic_p',16,'팔콘','50cm'],A16:['LRO_NAC_Mosaic_09S015E_50cmp',15,'오리온','50cm'],A17:['NAC_DTM_APOLLO17_MOSAIC_120CM',14,'챌린저','1.2m']};
 var AV={el:null,cv:null,on:false,site:null,lon:0,lat:0,z:12,cache:{},pts:{},raf:0};
 function avTile(layer,z,r,c,ext){var k=layer+'/'+z+'/'+r+'/'+c,t=AV.cache[k];if(t)return t;t=AV.cache[k]={im:new Image(),ok:false};t.im.crossOrigin='anonymous';t.im.onload=function(){t.ok=true;avDraw()};t.im.onerror=function(){t.bad=true};
  t.im.src='https://trek.nasa.gov/tiles/Moon/EQ/'+layer+'/1.0.0/default/default028mm/'+z+'/'+r+'/'+c+'.'+ext;return t}
@@ -1346,8 +1346,8 @@ function avRender(){var cv=AV.cv,W=innerWidth,H=innerHeight,dpr=Math.min(2,devic
   for(var r=Math.max(0,r0);r<=Math.min(n-1,r1);r++)for(var c=Math.max(0,c0);c<=Math.min(2*n-1,c1);c++){var t=avTile(name,z,r,c,ext);if(t.ok)x.drawImage(t.im,W/2+(c*ts-cx)*kx,H/2+(r*ts-cy),ts*kx+.6,ts+.6)}}
  layer('LRO_WAC_Mosaic_Global_303ppd_v02',8,'jpg',AV.z);layer(S[0],S[1],'png',AV.z);
  /* 착륙선 표시 */
- var n=Math.pow(2,AV.z),px=W/2+((AV.site[2]-AV.lon)/360*2*n*256)*kx,py=H/2-((AV.site[1]-AV.lat)/180*n*256),mpp=180/n/256*D2R*1737400;
- var rr=Math.max(14,8/mpp);x.strokeStyle='rgba(255,215,106,.95)';x.lineWidth=2;x.beginPath();x.arc(px,py,rr,0,7);x.stroke();
+ var n=Math.pow(2,AV.z),sl=S[4]||[AV.site[1],AV.site[2]],px=W/2+((sl[1]-AV.lon)/360*2*n*256)*kx,py=H/2-((sl[0]-AV.lat)/180*n*256),mpp=180/n/256*D2R*1737400;
+ var rr=Math.max(16,(AV.site[3]==='A16'?30:14)/mpp);x.strokeStyle='rgba(255,215,106,.95)';x.lineWidth=2;x.beginPath();x.arc(px,py,rr,0,7);x.stroke();
  x.font='800 13px Pretendard,sans-serif';x.textAlign='center';x.lineWidth=4;x.strokeStyle='rgba(0,0,0,.7)';var lb='🚀 '+S[2]+' 착륙선';x.strokeText(lb,px,py-rr-8);x.fillStyle='#ffe2a0';x.fillText(lb,px,py-rr-8);
  /* 축척 막대 */
  var want=W*.22*mpp,nice=[1,2,5,10,20,50,100,200,500,1000,2000,5000,10000,20000].filter(function(v){return v<=want}).pop()||1,bl=nice/mpp;
@@ -1361,13 +1361,12 @@ function avOpen(site){if(!AV.el){var d=document.createElement('div');d.id='av';d
   ['pointerup','pointercancel'].forEach(function(t){cv.addEventListener(t,function(e){delete AV.pts[e.pointerId]})});
   cv.addEventListener('wheel',function(e){e.preventDefault();avZoom(-e.deltaY/400,true)},{passive:false});
   cv.addEventListener('dblclick',function(){avZoom(1)});addEventListener('resize',avDraw)}
- var S=APO[site[3]];AV.site=site;AV.lon=site[2];AV.lat=site[1];AV.z=S[1]-2.6;AV.on=true;AV.el.hidden=false;$('avT').textContent=site[0].replace(/^\S+ /,'').split(' · ')[0]+' 착륙지 · 화소 '+S[3];avDraw();
+ var S=APO[site[3]];AV.site=site;AV.lon=S[4]?S[4][1]:site[2];AV.lat=S[4]?S[4][0]:site[1];AV.z=S[1]-2.6;AV.on=true;AV.el.hidden=false;$('avT').textContent=site[0].replace(/^\S+ /,'').split(' · ')[0]+' 착륙지 · 화소 '+S[3];avDraw();
  toast('🔎 손가락으로 벌리면 착륙선·발자국 길까지 보여요',3000)}
 function avZoom(d,raw){var S=APO[AV.site[3]];AV.z=Math.max(6,Math.min(S[1]+1,AV.z+(raw?d:d*.7)));avDraw()}
 function avClose(){AV.on=false;if(AV.el)AV.el.hidden=true}
 lrocShow=function(n){if(!LRB){LRB=document.createElement('button');LRB.id='avGo';document.body.appendChild(LRB);LRB.onclick=function(e){e.stopPropagation();var s=LAND.filter(function(l){return l[3]===LRK})[0];if(s&&APO[s[3]])avOpen(s)}}
  var k=n&&APO[n[2]]?n[2]:'';if(k===LRK)return;LRK=k;LRB.hidden=!k;if(!k)return;LRB.innerHTML='🔎 '+esc(n[0].replace(/^\S+ /,'').split(' · ')[0])+' 착륙지<br><small>NASA 근접 사진('+APO[k][3]+')으로 들어가기</small>'};
-/*DBG*/if(/[?&]dbg=1/.test(location.search))window.__av=function(i){avOpen(LAND[i])};/*DBG*/
 if(/[?&]map/.test(location.search)){$('snd').remove();setMode('map')}else if(/[?&]sky/.test(location.search)){$('snd').remove();setMode('ar')}else autoStart();
 })();
 </script></body></html>

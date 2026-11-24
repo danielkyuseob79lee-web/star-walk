@@ -476,8 +476,8 @@ function build3(){
   cx.divideScalar(n);var lb=lab3(K[0],K[1],K[0],.75);lb.position.copy(cx);lb.position.y+=70;if(cx.y<0)lb.visible=false;G.add(lb)});
  // 행성
  var dd=pday(now);
- for(var pn in PLEL){var pp=pxy(pn,dd),aa=skyAA(pp.ra,pp.dec,L,lat);if(pp.mag>6.2)continue;var q=skyPos(aa[0],aa[1],RS*.985),sz2=pn==='금성'?30:pn==='목성'?26:pn==='화성'||pn==='토성'?23:17;
-  var sp=new THREE.Sprite(new THREE.SpriteMaterial({map:starTex(),color:pp.col,depthTest:false,transparent:true,blending:THREE.AdditiveBlending}));sp.position.copy(q);sp.scale.set(sz2,sz2,1);sp.renderOrder=5;G.add(sp);
+ for(var pn in PLEL){var pp=pxy(pn,dd),aa=skyAA(pp.ra,pp.dec,L,lat);if(pp.mag>6.2)continue;var q=skyPos(aa[0],aa[1],RS*.985),sz2=pn==='금성'?30:pn==='목성'?26:pn==='화성'||pn==='토성'?23:pn==='천왕성'?7:17;
+  var sp=new THREE.Sprite(new THREE.SpriteMaterial({map:starTex(),color:pp.col,depthTest:false,transparent:true,blending:THREE.AdditiveBlending}));sp.position.copy(q);sp.scale.set(sz2,sz2,1);if(pn==='천왕성')sp.material.opacity=.5;sp.renderOrder=5;G.add(sp);
   if(aa[0]>-0.02){var pl=lab3(pn,pp.col,'🪐 '+pn,.75);pl.position.set(q.x,q.y+70,q.z);pl.userData.anc=q.clone();pl.userData.dir=-1;pl.userData.pri=2;G.add(pl)}}
  // 달
  try{var ma=moonAA(now),mq=skyPos(ma[0],ma[1],RS*.98);if(ma[0]>-0.02){var ml=lab3('달','#fff3c4','🌙 달 · '+moonName(moonAgeAt(now))[1],.85);ml.position.set(mq.x,mq.y-60,mq.z);ml.userData.anc=mq.clone();ml.userData.dir=-1;ml.userData.pri=3;G.add(ml)}}catch(e){console.warn(e)}
@@ -699,7 +699,7 @@ function skySpin(){if(!G3||!G3.userData.ax)return;var t=T().getTime(),dt=(t-G3.u
 var TGc=null,TGV=new THREE.Vector3(),TG_ON=true;try{TG_ON=localStorage.getItem('star_tg')!=='0'}catch(e){}
 $('tgB').classList.toggle('off',!TG_ON);$('tgB').onclick=function(){TG_ON=!TG_ON;try{localStorage.setItem('star_tg',TG_ON?'1':'0')}catch(e){}this.classList.toggle('off',!TG_ON);toast(TG_ON?'〰 길잡이 선 켬':'길잡이 선 숨김',1500)};
 function tguide(){var cv=$('tguide');if(!TGc){TGc=cv.getContext('2d')}var w=innerWidth,h=innerHeight;if(cv.width!==w*DPR){cv.width=w*DPR;cv.height=h*DPR;cv.style.width=w+'px';cv.style.height=h+'px'}
- var x=TGc;x.setTransform(DPR,0,0,DPR,0,0);x.clearRect(0,0,w,h);if(!TEL.on||MODE!=='ar'||!TG_ON)return;
+ var x=TGc;x.setTransform(DPR,0,0,DPR,0,0);x.clearRect(0,0,w,h);if(MODE==='ar'&&TG_ON&&!TEL.on&&FIND){try{tgFind(x,w,h)}catch(e){}return}if(!TEL.on||MODE!=='ar'||!TG_ON)return;
  var R0=Math.min(w*.44,h*.40),cx=w/2,cy=h/2,f=new THREE.Vector3(0,0,-1).applyQuaternion(C.quaternion),half=V.fov/2*D2R*Math.min(1,w/h),list=[];
  TEL.discs.concat(TEL.moons,TEL.moonM?[TEL.moonM]:[]).forEach(function(o){var nm=o.userData.nm||o.userData.nm2;if(!nm)return;o.getWorldPosition(TGV);list.push({n:(o.userData.nm2?'🛰 ':'')+nm,p:TGV.clone(),r:o.geometry&&o.geometry.parameters&&o.geometry.parameters.radius||0})});
  if(FIND){var aa=skyAA(FIND.ra,FIND.dec,skyLST(T(),SKY.lon),SKY.lat);list.push({n:FIND.n,p:skyPos(aa[0],aa[1],RS),r:0,go:1})}
@@ -788,12 +788,12 @@ function dsoTick(){var k=Math.max(0,Math.min(1,(30-V.fov)/24));DSOM.forEach(func
 var FIND=null;
 function findGo(o){FIND=o;CX.go=null;closeCard();$('dg').hidden=true;setMode('ar');toast('🧭 화살표를 따라 '+o.n+' 쪽으로 · 가까이 가면 저절로 당겨요',3500)}
 function findTick(){var a=$('arw');if(!FIND||MODE!=='ar')return false;var now=T(),aa=skyAA(FIND.ra,FIND.dec,skyLST(now,SKY.lon),SKY.lat);
- if(aa[0]<0){a.hidden=false;a.style.left='50%';a.style.top='28%';a.firstChild.style.display='none';a.lastChild.textContent=FIND.n+' · 지금은 지평선 아래예요';return true}
+ if(aa[0]<0){a.hidden=false;a.style.left='50%';a.style.top='28%';a.firstChild.style.display='none';a.lastChild.style.left='';a.lastChild.textContent=FIND.n+' · 지금은 지평선 아래예요';return true}
  var q=skyPos(aa[0],aa[1],RS),p=q.clone().project(C),beh=p.z>1;if(beh){p.x=-p.x;p.y=-p.y}
  if(!beh&&Math.abs(p.x)<.12&&Math.abs(p.y)<.12){a.hidden=true;if(!FIND.zoomed){FIND.zoomed=1;V.taz=aa[1];V.talt=aa[0];telSet(FIND.z||.7);setTimeout(function(){if(FIND){var f=FIND;FIND=null;card2(f)}},1200)}return true}
- if(!beh&&Math.abs(p.x)<.8&&Math.abs(p.y)<.8){a.hidden=false;a.firstChild.style.display='none';a.style.left=((p.x+1)/2*innerWidth)+'px';a.style.top=((1-p.y)/2*innerHeight-40)+'px';a.lastChild.textContent='⌖ '+FIND.n+' · 가운데로';return true}
+ if(!beh&&Math.abs(p.x)<.8&&Math.abs(p.y)<.8){a.hidden=false;a.firstChild.style.display='none';a.style.left=((p.x+1)/2*innerWidth)+'px';a.style.top=((1-p.y)/2*innerHeight-40)+'px';a.lastChild.style.left='';a.lastChild.textContent='⌖ '+FIND.n+' · 가운데로';return true}
  var ang=Math.atan2(p.y,p.x),ex=Math.cos(ang),ey=Math.sin(ang),k=.82/Math.max(Math.abs(ex),Math.abs(ey));
- a.hidden=false;a.firstChild.style.display='';a.style.left=((ex*k+1)/2*innerWidth)+'px';a.style.top=((1-(ey*k+1)/2)*innerHeight)+'px';a.firstChild.style.transform='rotate('+(90-ang*R2D)+'deg)';a.lastChild.textContent=FIND.n+' 쪽으로';return true}
+ var ap=tgArw(ex,ey,k);a.hidden=false;a.firstChild.style.display='';a.style.left=ap[0]+'px';a.lastChild.style.left=(-80+Math.max(8-(ap[0]-80),Math.min(0,innerWidth-(innerWidth<700?64:8)-(ap[0]+80))))+'px';a.style.top=ap[1]+'px';a.firstChild.style.transform='rotate('+(90-ang*R2D)+'deg)';a.lastChild.innerHTML=esc(FIND.n)+'<br>'+dir8(aa[1])+'쪽 높이 '+Math.round(aa[0]*R2D)+'° · '+Math.round(new THREE.Vector3(0,0,-1).applyQuaternion(C.quaternion).angleTo(q.clone().normalize())*R2D)+'° 남음';return true}
 function card2(o){closeCard();var d=document.createElement('div');d.className='card';d.innerHTML='<div class="t">'+esc(o.icon+' '+o.n)+'</div><p>'+esc(o.d)+'</p><div class="bt"><button class="w" id="cX">닫기</button></div>';document.body.appendChild(d);$('cX').onclick=closeCard}
 function proList(kind){if(!TEL.pro)return '<div class="sub" style="margin:20px 4px">🔒 PRO 에서 볼 수 있어요 — 성운·은하·성단 진짜 사진, 블랙홀 자리, 외계행성을 가진 별 찾기</div>';
  var L=kind==='심우주'?MES.map(function(m){return {n:(MKO[m[0]]||m[1]||m[0])+' · '+m[0],ra:m[5],dec:m[6],z:Math.max(.25,Math.min(.6,.62-Math.log(parseFloat(m[4])||10)/12)),icon:'🌌',d:(MTY[m[2]]||'천체')+' · '+(m[7]||'')+' · 밝기 '+m[3]+'등급 · 크기 '+m[4]+'′'}})
@@ -869,7 +869,7 @@ function draw2(){if(MODE!=='map')return;var x=X2,w=innerWidth,h=innerHeight,o=ge
   else{x.font='600 '+(11*Math.min(1.3,M2.z))+'px Pretendard,sans-serif';x.textAlign='center';x.fillStyle=got[c.id]?'rgba(255,224,150,.9)':'rgba(200,210,240,.62)';x.fillText(c.ko.replace(/자리$/,''),cp[0],cp[1])}});
  // 행성 · 달
  var dd=pday(now);for(var pn in PLEL){var pp=pxy(pn,dd);if(pp.mag>6.2)continue;var a3=skyAA(pp.ra,pp.dec,L,lat);if(a3[0]<0)continue;var p3=prj(a3[0],a3[1],o);
-  x.fillStyle=pp.col;x.shadowColor=pp.col;x.shadowBlur=10;x.beginPath();x.arc(p3[0],p3[1],4.2,0,7);x.fill();x.shadowBlur=0;x.font='700 12px Pretendard,sans-serif';x.fillStyle=pp.col;x.textAlign='left';x.fillText(pn,p3[0]+7,p3[1]-6)}
+  var dim=pn==='천왕성';x.fillStyle=pp.col;x.shadowColor=pp.col;x.shadowBlur=dim?0:10;x.globalAlpha=dim?.6:1;x.beginPath();x.arc(p3[0],p3[1],dim?1.8:4.2,0,7);x.globalAlpha=1;x.fill();x.shadowBlur=0;x.font='700 12px Pretendard,sans-serif';x.fillStyle=pp.col;x.textAlign='left';x.fillText(pn,p3[0]+7,p3[1]-6)}
  try{var sa2=sunAA(now);DAY=sa2[0]>-6*D2R;if(sa2[0]>0){var ps=prj(sa2[0],sa2[1],o);var sg=x.createRadialGradient(ps[0],ps[1],0,ps[0],ps[1],26);sg.addColorStop(0,'#fff3c4');sg.addColorStop(.35,'#ffcf6a');sg.addColorStop(1,'rgba(255,207,106,0)');x.fillStyle=sg;x.beginPath();x.arc(ps[0],ps[1],26,0,7);x.fill();x.font='700 12px Pretendard,sans-serif';x.fillStyle='#ffd27a';x.textAlign='center';x.fillText('☀️ 해',ps[0],ps[1]+36)}}catch(e){}
  try{var ma=moonAA(now);if(ma[0]>0){var pm=prj(ma[0],ma[1],o);drawMoon(moonAgeAt(now));x.drawImage(MCV,pm[0]-22,pm[1]-22,44,44);x.font='700 12px Pretendard,sans-serif';x.fillStyle='#fff3c4';x.textAlign='center';x.fillText('🌙 '+moonName(moonAgeAt(now))[1],pm[0],pm[1]+30)}}catch(e){}
  x.restore();
@@ -1243,6 +1243,45 @@ lockPill=function(t){var e=$('lockp');if(!e){e=document.createElement('div');e.i
  e.innerHTML='<span>🔒 따라가는 중 · 스틱·끌기로 살짝 옮겨요</span><button id="lkC">⌖ 가운데</button><button id="lkX">🔓 풀기</button>';
  $('lkC').onclick=function(ev){ev.stopPropagation();if(LOCK){LOCK.ox=LOCK.oy=0;toast('⌖ 다시 가운데로',1200)}};$('lkX').onclick=function(ev){ev.stopPropagation();lockOff(1)}};
 
+
+/* 🧭 전경에서도 길잡이 선 : 찾기 대상까지 가운데에서 흐르는 점선 · 북극성은 북두칠성 국자 끝 두 별 연장선까지 */
+function tgArw(ex,ey,k){var w=innerWidth,h=innerHeight,m=36,mr=w<700?84:36;return [Math.max(m,Math.min(w-mr,(ex*k+1)/2*w)),Math.max(90,Math.min(h-210,(1-(ey*k+1)/2)*h))]}
+function tgScr(ra,dec){var aa=skyAA(ra,dec,skyLST(T(),SKY.lon),SKY.lat),p=skyPos(aa[0],aa[1],RS).project(C);return p.z<1?[(p.x+1)/2*innerWidth,(1-p.y)/2*innerHeight]:null}
+function tgPole(x){var st={};STARD.forEach(function(r){st[r[0]]=r});var D=st['두베'],M=st['메라크'],P=st['북극성'];if(!D||!M||!P)return;
+ var d=tgScr(D[1],D[2]),m=tgScr(M[1],M[2]),p=tgScr(P[1],P[2]);if(!d||!m)return;
+ x.save();x.strokeStyle='rgba(140,200,255,.9)';x.lineWidth=2;x.beginPath();x.arc(d[0],d[1],8,0,7);x.stroke();x.beginPath();x.arc(m[0],m[1],8,0,7);x.stroke();
+ var ux=d[0]-m[0],uy=d[1]-m[1],ex=p?p[0]:d[0]+ux*5,ey=p?p[1]:d[1]+uy*5;x.setLineDash([2,6]);x.lineWidth=1.4;x.beginPath();x.moveTo(m[0],m[1]);x.lineTo(ex,ey);x.stroke();x.setLineDash([]);
+ for(var i=1;i<=5;i++){var tx=d[0]+(ex-d[0])*i/5,ty=d[1]+(ey-d[1])*i/5;x.fillStyle='rgba(140,200,255,.8)';x.beginPath();x.arc(tx,ty,i===5?0:2,0,7);x.fill()}
+ x.font='700 12px Pretendard,sans-serif';x.textAlign='center';x.lineWidth=3;x.strokeStyle='rgba(0,0,0,.6)';var lx=(m[0]+d[0])/2,ly=(m[1]+d[1])/2+22;x.strokeText('국자 끝 두 별 × 5',lx,ly);x.fillStyle='#bfe0ff';x.fillText('국자 끝 두 별 × 5',lx,ly);
+ if(p){x.strokeStyle='rgba(255,215,106,.95)';x.lineWidth=2;x.beginPath();x.arc(p[0],p[1],14,0,7);x.stroke();x.strokeStyle='rgba(0,0,0,.6)';x.lineWidth=3;x.strokeText('⭐ 북극성 = 북쪽',p[0],p[1]+32);x.fillStyle='#ffe2a0';x.fillText('⭐ 북극성 = 북쪽',p[0],p[1]+32)}x.restore()}
+function tgFind(x,w,h){if(FIND.pole)try{tgPole(x)}catch(e){}var aa=skyAA(FIND.ra,FIND.dec,skyLST(T(),SKY.lon),SKY.lat);if(aa[0]<0)return;var q=skyPos(aa[0],aa[1],RS),p=q.clone().project(C),beh=p.z>1;if(beh){p.x=-p.x;p.y=-p.y}
+ if(!beh&&Math.abs(p.x)<.12&&Math.abs(p.y)<.12)return;var cx=w/2,cy=h/2,tx,ty,inV=!beh&&Math.abs(p.x)<.8&&Math.abs(p.y)<.8;
+ if(inV){tx=(p.x+1)/2*w;ty=(1-p.y)/2*h}else{var ang=Math.atan2(p.y,p.x),ex=Math.cos(ang),ey=Math.sin(ang),k=.82/Math.max(Math.abs(ex),Math.abs(ey)),ap=tgArw(ex,ey,k);tx=ap[0];ty=ap[1]}
+ var dx=tx-cx,dy=ty-cy,L=Math.hypot(dx,dy)||1;dx/=L;dy/=L;if(L<80)return;
+ x.strokeStyle='rgba(255,215,106,.65)';x.lineWidth=1.4;x.setLineDash([4,6]);x.lineDashOffset=-(performance.now()/50)%10;x.beginPath();x.moveTo(cx+dx*56,cy+dy*56);x.lineTo(tx-dx*(inV?18:26),ty-dy*(inV?18:26));x.stroke();x.setLineDash([]);
+ if(inV&&!FIND.pole){x.strokeStyle='rgba(255,215,106,.9)';x.beginPath();x.arc(tx,ty,13,0,7);x.stroke()}}
+/* ⭐ 북극성 찾기 칩 */
+function poleGo(){findGo({n:'북극성',ra:2.530,dec:89.264,z:.5,icon:'⭐',pole:1,d:'북쪽 하늘에서 거의 안 움직이는 별이에요. 높이는 내 위도와 같아요 (지금 '+Math.round(SKY.lat)+'°). 북두칠성 국자 끝 두 별(메라크→두베) 사이를 5번 늘리면 만나요.'})}
+var _chips2=chips;chips=function(){_chips2.apply(this,arguments);try{var c=$('chips'),b=document.createElement('button');b.className='chip';b.id='cPo';b.textContent='⭐ 북극성';b.onclick=poleGo;var t=$('cTn');c.insertBefore(b,t?t.nextSibling:c.firstChild)}catch(e){}};
+try{chips()}catch(e){}
+/* 🌕 달 : 넓게 볼 땐 살짝 크게 + 은은한 빛무리 (당기면 진짜 크기 0.52° 로) */
+var MGLOW=null;function moonGlowAdd(){if(!G3)return;try{var d=T(),ma=moonAA(d);MGLOW=null;if(ma[0]<-0.05)return;var il=moonIll(d)/100,q=skyPos(ma[0],ma[1],RS*.95);
+ MGLOW=new THREE.Sprite(new THREE.SpriteMaterial({map:starTex(),color:'#fff3d0',depthTest:false,transparent:true,opacity:.35+.5*il,blending:THREE.AdditiveBlending}));MGLOW.scale.set(60+120*il,60+120*il,1);MGLOW.position.copy(q);MGLOW.renderOrder=4;G3.add(MGLOW)}catch(e){}}
+var _build3m=build3;build3=function(){_build3m.apply(this,arguments);moonGlowAdd()};moonGlowAdd();
+(function moonLoop(){requestAnimationFrame(moonLoop);try{var big=!TEL.on&&MODE==='ar';if(MGLOW)MGLOW.visible=big;if(TEL.moonM&&!TEL.on){var f=Math.max(1,Math.min(3.2,(V.fov-10)/12));TEL.moonM.scale.set(f,f,f)}}catch(e){}})();
+/* 🧭 별자리판 나침반 : 폰이 향한 쪽이 판 아래로 오게 저절로 돌려요 */
+var CMP={on:false,h:null,lis:false};
+function cmpEv(e){var h=null;if(e.webkitCompassHeading!=null&&e.webkitCompassHeading>=0)h=e.webkitCompassHeading*D2R;
+ else if(e.absolute||e.type==='deviceorientationabsolute'){if(e.alpha==null)return;var a=e.alpha*D2R,b=(e.beta||0)*D2R,g=(e.gamma||0)*D2R,ca=Math.cos(a),sa=Math.sin(a),cb=Math.cos(b),sb=Math.sin(b),cg=Math.cos(g),sg=Math.sin(g);
+  var flat=Math.abs(e.beta||0)<40,vx,vy;if(flat){vx=-sa*cb;vy=ca*cb}else{vx=-(ca*sg+sa*sb*cg);vy=-(sa*sg-ca*sb*cg)}h=Math.atan2(vx,vy);
+  try{var sc=(screen.orientation&&screen.orientation.angle)||0;if(!flat)h+=0;else h-=sc*D2R}catch(x){}}
+ if(h==null)return;CMP.h=h}
+function cmpOn(){function go(){if(!CMP.lis){CMP.lis=true;addEventListener('deviceorientationabsolute',cmpEv,true);addEventListener('deviceorientation',cmpEv,true)}CMP.on=true;M2.z=1;M2.px=M2.py=0;setTimeout(function(){if(CMP.on&&CMP.h==null)toast('🧭 나침반 신호가 없어요 · 폰에서 방향 허락을 켜 주세요',2600)},2500);toast('🧭 폰을 하늘로 들어 보세요 · 보는 쪽이 판 아래로 와요',2600);chips()}
+ try{if(window.DeviceOrientationEvent&&DeviceOrientationEvent.requestPermission){DeviceOrientationEvent.requestPermission().then(go).catch(go);return}}catch(e){}go()}
+function cmpOff(){CMP.on=false;chips()}
+(function cmpLoop(){requestAnimationFrame(cmpLoop);if(!CMP.on||MODE!=='map'||CMP.h==null)return;var want=Math.PI-CMP.h,d=Math.atan2(Math.sin(want-M2.rot),Math.cos(want-M2.rot));if(Math.abs(d)<.004)return;M2.rot+=d*.15;try{draw2()}catch(e){}})();
+var _ptM=null;['v2'].forEach(function(id){var el=$(id);if(el)el.addEventListener('pointermove',function(e){if(CMP.on&&e.buttons){cmpOff();toast('🧭 손으로 돌려서 나침반을 껐어요',1600)}})});
+var _chips3=chips;chips=function(){_chips3.apply(this,arguments);try{if(MODE!=='map')return;var c=$('chips'),b=document.createElement('button');b.className='chip'+(CMP.on?' on':'');b.id='cCp';b.textContent=CMP.on?'🧭 나침반 켬':'🧭 나침반 맞춤';b.onclick=function(){CMP.on?cmpOff():cmpOn()};c.insertBefore(b,c.firstChild)}catch(e){}};
 if(/[?&]map/.test(location.search)){$('snd').remove();setMode('map')}else if(/[?&]sky/.test(location.search)){$('snd').remove();setMode('ar')}else autoStart();
 })();
 </script></body></html>

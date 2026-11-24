@@ -152,6 +152,7 @@ button{font:inherit;color:inherit;border:0;background:none;cursor:pointer;paddin
 #chips.en{-webkit-mask-image:linear-gradient(90deg,transparent,#000 30px);mask-image:linear-gradient(90deg,transparent,#000 30px)}
 @media(min-width:900px){#chips{flex:1 1 0;min-width:0}}
 @media(min-width:900px){#hint{flex:0 1 300px;min-width:0}}
+#prb{position:absolute;top:calc(100% + 26px);left:50%;transform:translateX(-50%);white-space:nowrap;background:#22304F;color:#9fd4ff;font:900 11px var(--f);border-radius:12px;padding:6px 8px;line-height:1.3;box-shadow:inset 0 0 0 1px rgba(159,212,255,.35)}
 </style></head>
 <body>
 <div id="v3"></div><canvas id="v2" hidden></canvas>
@@ -1295,6 +1296,34 @@ var _chips3=chips;chips=function(){_chips3.apply(this,arguments);try{if(MODE!=='
 (function(){var c=$('chips');if(!c)return;function edge(){var a=c.scrollLeft>4,b=c.scrollLeft+c.clientWidth<c.scrollWidth-4;c.classList.toggle('st',a&&b);c.classList.toggle('en',a&&!b)}
  c.addEventListener('scroll',edge,{passive:true});c.addEventListener('wheel',function(e){if(Math.abs(e.deltaY)>Math.abs(e.deltaX)){c.scrollLeft+=e.deltaY;e.preventDefault()}},{passive:false});
  var _ch=chips;chips=function(){var x=c.scrollLeft;_ch.apply(this,arguments);c.style.scrollBehavior='auto';c.scrollLeft=x;c.style.scrollBehavior='';edge()};setTimeout(edge,500)})();
+/* 🛰 탐사선 사진으로 더 당기기 : 제임스웹급 끝에서 위성을 가운데 두면 탐사선이 가까이 가서 찍은 사진으로 꽉 차게 (따로 그려서 흔들림·깨짐 없이) */
+var PRB={o:null,on:false,k:0,min:0,told:0,cap:0,ps:new THREE.Scene(),pc:new THREE.PerspectiveCamera(60,1,.1,100),m:null,hid:null};
+var PRBN={'목성':'갈릴레오·보이저 탐사선','토성':'카시니 탐사선','천왕성':'보이저 2호','해왕성':'보이저 2호','화성':'바이킹·화성 정찰 위성'};var PRBS={'목성':'갈릴레오·보이저 탐사선이','토성':'카시니 탐사선이','천왕성':'보이저 2호가','해왕성':'보이저 2호가','화성':'바이킹·화성 정찰 위성이'};
+(function(){var b=document.createElement('button');b.id='prb';b.hidden=true;$('tel').appendChild(b);b.onclick=function(e){e.stopPropagation();if(PRB.on){PRB.on=false}else if(PRB.o){PRB.on=true;PRB.told=0;PRB.cap=0;toast('🛰 '+(PRBS[PRB.o.userData.of]||'탐사선이')+' 가까이 가서 찍은 '+PRB.o.userData.nm2+' 사진으로 들어가요'+(/천왕성|해왕성/.test(PRB.o.userData.of)?' · 보이저 2호가 못 찍은 쪽은 회색으로 칠했어요':''),4200)}}})();
+function prbAng(o){var p=o.getWorldPosition(new THREE.Vector3()),r=(o.geometry&&o.geometry.parameters&&o.geometry.parameters.radius||0)*o.scale.x;return {p:p,a:Math.asin(Math.min(1,r/p.length()))}}
+function prbPick(){var f=new THREE.Vector3(0,0,-1).applyQuaternion(C.quaternion),best=null,ba=1e9;TEL.moons.forEach(function(o){if(!o.userData.nm2)return;var a=f.angleTo(o.getWorldPosition(new THREE.Vector3()).normalize());if(a<ba){ba=a;best=o}});return ba<V.fov*D2R*.35?best:null}
+function prbTick(dt){var b=$('prb');if(!b)return;var ok=TEL.pro&&MODE==='ar'&&TEL.t>=.99;
+ if(!ok)PRB.on=false;if(!PRB.on&&PRB.k<=0){PRB.o=ok?prbPick():null}
+ if(PRB.on&&PRB.o){var A=prbAng(PRB.o);PRB.min=Math.max(2*A.a*R2D*1.3,1e-9);var d=A.p.clone().normalize();V.talt=V.alt=Math.asin(Math.max(-1,Math.min(1,d.y)));V.taz=V.az=Math.atan2(d.x,-d.z)}
+ PRB.k=Math.max(0,Math.min(1,PRB.k+(PRB.on?1:-1)*dt/1.6));
+ if(PRB.k>=1&&!PRB.cap){PRB.cap=1;toast('🛰 여기까지가 '+(PRBN[PRB.o.userData.of]||'탐사선')+' 사진 한계예요 · 더 당기면 흐려져서 멈췄어요',3400)}
+ if(PRB.k<=0&&PRB.hid){PRB.hid.visible=TEL.on;PRB.hid=null}
+ b.hidden=!(PRB.on||PRB.k>0||PRB.o);var tg=$('tguide');if(tg)tg.style.opacity=PRB.k>0?0:'';b.innerHTML=PRB.on||PRB.k>0?'↩ 망원경으로':'🛰 탐사선 사진<br>'+(PRB.o?esc(PRB.o.userData.nm2):'')+' 더 당기기';
+ if(PRB.k>0){var e=$('tmag');if(e)e.innerHTML='🛰 '+(PRB.o?esc(PRB.o.userData.nm2):'')+'<br><small style="color:#9fd4ff">탐사선 사진</small>'}}
+var _telFov=telFov;telFov=function(){var f=_telFov();if(PRB.k>0&&PRB.min>0&&PRB.min<f){var e=PRB.k*PRB.k*(3-2*PRB.k);f=f*Math.pow(PRB.min/f,e)}return f};
+/* 탐사선이 못 찍은 쪽(검은 칸)은 회색으로 메꿈 — 천왕성·해왕성 위성은 보이저 2호가 남쪽 반만 찍었어요 */
+var PRBF={};function prbFill(t){var im=t&&t.image;if(!im||!im.width)return t;var k=im.src||'';if(PRBF[k])return PRBF[k];try{var c=document.createElement('canvas');c.width=im.width;c.height=im.height;var x=c.getContext('2d');x.drawImage(im,0,0);var d=x.getImageData(0,0,c.width,c.height),p=d.data,n=0,sum=0,cnt=0;
+ for(var i=0;i<p.length;i+=4){var l=p[i]+p[i+1]+p[i+2];if(l>30){sum+=l;cnt++}}var g=cnt?sum/cnt/3*.8:70;
+ for(var i=0;i<p.length;i+=4){if(p[i]+p[i+1]+p[i+2]<=12){p[i]=p[i+1]=p[i+2]=g;n++}}
+ x.putImageData(d,0,0);var tt=new THREE.CanvasTexture(c);tt.anisotropy=8;tt.userData={gap:n/(p.length/4)};PRBF[k]=tt;return tt}catch(e){return t}}
+function prbDraw(){if(PRB.k<=0||!PRB.o)return;var o=PRB.o,A=prbAng(o),F=Math.tan(A.a)/Math.tan(V.fov*D2R/2);if(F<.02){if(PRB.hid){PRB.hid.visible=true;PRB.hid=null}return}
+ var tp=Math.asin(.1),cf=2*Math.atan(Math.tan(tp)/F)*R2D;if(cf>170)return;
+ if(!PRB.m||PRB.m.userData.src!==o){if(PRB.m){PRB.ps.remove(PRB.m);PRB.m.geometry.dispose()}PRB.m=new THREE.Mesh(new THREE.SphereGeometry(1,128,96),bodyMat(prbFill(o.material.uniforms.map.value)));PRB.m.userData.src=o;PRB.m.position.set(0,0,-10);PRB.ps.add(PRB.m)}
+ var qi=C.quaternion.clone().invert(),wq=o.getWorldQuaternion(new THREE.Quaternion());PRB.m.quaternion.copy(qi.clone().multiply(wq));PRB.m.material.uniforms.uL.value.copy(o.material.uniforms.uL.value).applyQuaternion(qi);
+ var pr=A.p.clone().project(C),pc=PRB.pc;pc.fov=cf;pc.aspect=innerWidth/innerHeight;pc.updateProjectionMatrix();var v=new THREE.Vector3(pr.x,pr.y,.5).unproject(pc).normalize();PRB.m.position.copy(v.multiplyScalar(10));
+ if(!PRB.hid){PRB.hid=o}o.visible=false;R3.autoClear=false;R3.clearDepth();R3.render(PRB.ps,pc);R3.autoClear=true}
+var _r3r=R3.render.bind(R3);R3.render=function(sc,cam){_r3r(sc,cam);if(sc===S&&cam===C){try{prbDraw()}catch(e){}}};
+(function prbLoop(t){requestAnimationFrame(prbLoop);var dt=Math.min(.1,((t||0)-(PRB.t0||t||0))/1000);PRB.t0=t;try{prbTick(dt)}catch(e){}})();
 if(/[?&]map/.test(location.search)){$('snd').remove();setMode('map')}else if(/[?&]sky/.test(location.search)){$('snd').remove();setMode('ar')}else autoStart();
 })();
 </script></body></html>
